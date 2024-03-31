@@ -3,20 +3,18 @@ import pandas as pd
 class Appearances:
     date_cols = ['date']
     schema = {
-        'appearance_id':pd.StringDtype(),
-        'game_id':pd.Int64Dtype(),
-    date_cols = ['date']
-    schema = {
-        player_id                               int64
-date                                   object
-market_value_in_eur                     int64
-current_club_id                         int64
-player_club_domestic_competition_id    object
-    }        'yellow_cards':pd.Int64Dtype(),
-        'red_cards':pd.Int64Dtype(),
-        'goals':pd.Int64Dtype(),
-        'assists':pd.Int64Dtype(),
-        'minutes_played':pd.Float64Dtype(),
+    'appearance_id':pd.StringDtype(),
+    'game_id':pd.StringDtype(),
+    'player_id':pd.StringDtype(),    
+    'player_club_id':pd.StringDtype(),
+    'player_current_club_id':pd.StringDtype(),
+    'player_name':pd.StringDtype(),
+    'competition_id':pd.StringDtype(),
+    'yellow_cards':pd.Int64Dtype(),
+    'red_cards':pd.Int64Dtype(),
+    'goals':pd.Int64Dtype(),
+    'assists':pd.Int64Dtype(),
+    'minutes_played':pd.Float64Dtype(),
     }
 
 class Club_Games:
@@ -78,27 +76,23 @@ class Game_Events:
     'minute':pd.Int64Dtype(),
     'type':pd.StringDtype(),
     'club_id':pd.Int64Dtype(),
-    date_cols = ['date']
-    schema = {
-        player_id                               int64
-date                                   object
-market_value_in_eur                     int64
-current_club_id                         int64
-player_club_domestic_competition_id    object
+    'player_id':pd.Int64Dtype(),
+    'description':pd.StringDtype(),
+    'player_in_id':pd.Float64Dtype(),
+    'player_assist_id':pd.Float64Dtype(),
     }
+
 class Game_Lineups:
     date_cols = ['date']
     schema = {
     'game_lineups_id':pd.StringDtype(),
     'game_id':pd.Int64Dtype(),
-    date_cols = ['date']
-    schema = {
-        player_id                               int64
-date                                   object
-market_value_in_eur                     int64
-current_club_id                         int64
-player_club_domestic_competition_id    object
-    }    'number':pd.StringDtype(),
+    'player_id':pd.Int64Dtype(),
+    'club_id':pd.Int64Dtype(),
+    'player_name':pd.StringDtype(),
+    'type':pd.StringDtype(),
+    'position':pd.StringDtype(),
+    'number':pd.StringDtype(),
     'team_captain':pd.Int64Dtype(),
     }
 
