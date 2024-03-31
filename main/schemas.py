@@ -132,3 +132,29 @@ class Player_Valuations:
     'current_club_id':pd.Int64Dtype(),
     'player_club_domestic_competition_id':pd.StringDtype(),
     }
+
+class Players:
+    date_cols = ['date_of_birth', 'contract_expiration_date']
+    schema = {
+        'player_id': pd.Int64Dtype(),
+        'first_name': pd.StringDtype(),
+        'last_name': pd.StringDtype(),
+        'name': pd.StringDtype(),
+        'last_season': pd.Int64Dtype(),
+        'current_club_id': pd.Int64Dtype(),
+        'player_code': pd.StringDtype(),
+        'country_of_birth': pd.StringDtype(),
+        'city_of_birth': pd.StringDtype(),
+        'country_of_citizenship': pd.StringDtype(),
+        'sub_position': pd.StringDtype(),
+        'position': pd.StringDtype(),
+        'foot': pd.StringDtype(),
+        'height_in_cm': pd.Float64Dtype(),
+        'agent_name': pd.StringDtype(),
+        'image_url': pd.StringDtype(),
+        'url': pd.StringDtype(),
+        'current_club_domestic_competition_id': pd.StringDtype(),
+        'current_club_name': pd.StringDtype(),
+        'market_value_in_eur': pd.Float64Dtype(),
+        'highest_market_value_in_eur': pd.Float64Dtype()
+    }
