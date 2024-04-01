@@ -18,6 +18,7 @@ class Appearances:
     }
 
 class Club_Games:
+    date_cols = None
     schema = {
         'game_id':pd.Int64Dtype(),
         'club_id':pd.Int64Dtype(),
@@ -33,6 +34,7 @@ class Club_Games:
     }
 
 class Clubs:
+    date_cols = None
     schema = {
     'club_id':pd.Int64Dtype(),
     'club_code':pd.StringDtype(),
@@ -54,6 +56,7 @@ class Clubs:
     }
 
 class Competitions:
+    date_cols = None
     schema = {
     'competition_id':pd.StringDtype(),
     'competition_code':pd.StringDtype(),
@@ -69,6 +72,7 @@ class Competitions:
     }
 
 class Game_Events:
+    date_cols = None
     schema = {
     'game_event_id':pd.StringDtype(),
     'date':pd.StringDtype(),
