@@ -1,5 +1,16 @@
 import pandas as pd
 
+class_names = [
+                'Appearances',
+                'Club_Games',
+                'Clubs',
+                'Competitions',
+                'Game_Events',
+                'Game_Lineups',
+                'Games',
+                'Player_Valuations',
+                'Players']
+
 class Appearances:
     date_cols = ['date']
     schema = {

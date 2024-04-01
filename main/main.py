@@ -8,6 +8,7 @@ from datetime import datetime
 from pyarrow import fs
 from kaggle.api.kaggle_api_extended import KaggleApi
 
+
 def download_dataset():
     dataset_name= "davidcariboo/player-scores"
     destination_dir= "../dataset/raw/"
@@ -28,21 +29,11 @@ def define_schema(file_name: str) -> pd.DataFrame:
 
 def define_schema_and_upload_to_gcs():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../.creds/gcp_key.json"
-    csv_file_names = [
-                    'Appearances',
-                    'Club_Games',
-                    'Clubs',
-                    'Competitions',
-                    'Game_Events',
-                    'Game_Lineups',
-                    'Games',
-                    'Player_Valuations',
-                    'Players']
 
     target_fs = fs.GcsFileSystem()
     bucket_name = 'transfermarkt-project'
 
-    for file_name in csv_file_names:
+    for file_name in schemas.class_names:
         arrow_table = pa.Table.from_pandas(define_schema(file_name))
         logging.info(f'Set schema of {file_name} and parsed to Arrow table')
 
@@ -55,7 +46,8 @@ def define_schema_and_upload_to_gcs():
                 pq.write_table(arrow_table, out)
                 logging.info(f'Wrote file {file_name.lower()}.parquet\n')
             except Exception as e:
-                logging.error(f'Couldn\'t write {gcs_path}')
+                logging.error(f'Couldn\'t write to {gcs_path}')
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,
