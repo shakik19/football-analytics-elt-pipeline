@@ -129,6 +129,18 @@ def load_data_gcs_to_bq():
             logging.error(e)
 
 
+def clean_csvs():
+    dir_path = variables.RAW_DATASET_DIR
+
+    logging.info("Cleaning raw csv files")
+    for filename in os.listdir(dir_path):
+        file_path = os.path.join(dir_path, filename)
+
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            logging.info(f"Deleted {file_path}")
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,
                         datefmt='%m-%d %H:%M',
