@@ -10,6 +10,19 @@ from kaggle.api.kaggle_api_extended import KaggleApi
 from google.cloud import bigquery
 
 
+"""
+Function: download_dataset
+
+Description:
+This function downloads files from a Kaggle dataset and extracts them to a specified directory.
+
+Behavior:
+1. Specifies the name of the Kaggle dataset and the destination directory.
+2. Authenticates the Kaggle API.
+3. Downloads files from the specified dataset to the destination directory.
+4. Extracts the downloaded files if they are zipped.
+"""
+
 def download_dataset():
     dataset_name= "davidcariboo/player-scores"
     destination_dir= "../dataset/raw/"
@@ -19,6 +32,19 @@ def download_dataset():
     api.dataset_download_files(dataset_name, path=destination_dir, unzip=True)
 
 
+"""
+Function: define_schema
+
+Description:
+This function defines a schema for a given CSV file and returns a pandas DataFrame with the specified schema.
+
+Parameters:
+- file_name (str): Name of the CSV file.
+  
+Returns:
+- pd.DataFrame: DataFrame with the defined schema.
+"""
+
 def define_schema(file_name: str) -> pd.DataFrame:
     path = f'../dataset/raw/{file_name.lower()}.csv'
     schema_class = getattr(schemas, file_name)
@@ -27,6 +53,19 @@ def define_schema(file_name: str) -> pd.DataFrame:
     return pd.read_csv(path, dtype=schema_class.schema,
                        parse_dates=schema_class.date_cols)
 
+
+"""
+Function: define_schema_and_upload_to_gcs
+
+Description:
+This function sets schemas for CSV files, converts them to Arrow tables, and uploads them to Google Cloud Storage (GCS) in Parquet format.
+
+Behavior:
+1. Sets Google Cloud credentials.
+2. Iterates through CSV files defined in the schema class.
+3. Converts CSV data to an Arrow table with the defined schema.
+4. Uploads the Arrow table from memory to GCS in Parquet format under a specified path.
+"""
 
 def define_schema_and_upload_to_gcs():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../.creds/gcp_key.json"
@@ -49,6 +88,21 @@ def define_schema_and_upload_to_gcs():
             except Exception as e:
                 logging.error(f'Couldn\'t write to {gcs_path}')
 
+
+"""
+Function: load_data_gcs_to_bq
+
+Description:
+This function loads data from Google Cloud Storage (GCS) into BigQuery tables.
+
+Behavior:
+1. Sets Google Cloud credentials.
+2. Initializes a BigQuery client.
+3. Retrieves the current date.
+4. Iterates through the class names defined in the schema.
+5. Constructs a SQL query to load data from GCS into BigQuery tables.
+6. Executes the SQL query to load data into BigQuery.
+"""
 
 def load_data_gcs_to_bq():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../.creds/gcp_key.json"
