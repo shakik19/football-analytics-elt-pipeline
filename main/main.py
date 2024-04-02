@@ -1,6 +1,7 @@
+import schemas
+import variables
 import os
 import logging
-import schemas
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -25,7 +26,7 @@ Behavior:
 
 def download_dataset():
     dataset_name= "davidcariboo/player-scores"
-    destination_dir= "../dataset/raw/"
+    destination_dir= variables.RAW_DATASET_DIR
 
     api = KaggleApi()
     api.authenticate()
@@ -46,7 +47,7 @@ Returns:
 """
 
 def define_schema(file_name: str) -> pd.DataFrame:
-    path = f'../dataset/raw/{file_name.lower()}.csv'
+    path = f'{variables.RAW_DATASET_DIR}{file_name.lower()}.csv'
     schema_class = getattr(schemas, file_name)
 
     logging.info(f'Setting schema for {file_name}')
@@ -68,10 +69,10 @@ Behavior:
 """
 
 def define_schema_and_upload_to_gcs():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../.creds/gcp_key.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = variables.SERVICE_ACC_PATH
 
     target_fs = fs.GcsFileSystem()
-    bucket_name = 'transfermarkt-project'
+    bucket_name = variables.BUCKET_NAME
 
     for file_name in schemas.class_names:
         arrow_table = pa.Table.from_pandas(define_schema(file_name))
@@ -81,7 +82,7 @@ def define_schema_and_upload_to_gcs():
         gcs_path = f'{bucket_name}/{current_date}/{file_name.lower()}.parquet'
 
         with target_fs.open_output_stream(gcs_path) as out:
-            logging.info(f'Opened GCS output stream with path: {gcs_path}')
+            logging.info(f'Opened GCS output stream with path: gs://{gcs_path}')
             try:
                 pq.write_table(arrow_table, out)
                 logging.info(f'Wrote file {file_name.lower()}.parquet\n')
@@ -105,23 +106,25 @@ Behavior:
 """
 
 def load_data_gcs_to_bq():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../.creds/gcp_key.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = variables.SERVICE_ACC_PATH
+    dataset_name = variables.DATASET_NAME
+    bucket_name = variables.BUCKET_NAME
     client = bigquery.Client()
     date = datetime.now().strftime('%m-%Y')
     
-    for name in schemas.class_names:
-        name = name.lower()
+    for table_name in schemas.class_names:
+        table_name = table_name.lower()
         query = f"""
-            LOAD DATA OVERWRITE final_project.{name}
+            LOAD DATA OVERWRITE {dataset_name}.{table_name}
             FROM FILES (
             format = 'PARQUET',
-            uris = ['gs://transfermarkt-project/{date}/{name}.parquet']);
+            uris = ['gs://{bucket_name}/{date}/{table_name}.parquet']);
         """
 
-        logging.info(f'Loading {name} table')
+        logging.info(f'Loading {table_name} table')
         try:
             client.query(query)
-            logging.info(f'Successfully loaded {name} table\n')
+            logging.info(f'Successfully loaded {table_name} table\n')
         except TypeError as e:
             logging.error(e)
 
@@ -132,7 +135,7 @@ if __name__ == '__main__':
                         format='%(asctime)s %(name)s - %(levelname)s - %(message)s',
                         handlers=[logging.FileHandler('app.log'), logging.StreamHandler()])
     logging.info("START")
-    # define_schema_and_upload_to_gcs()
-    # load_data_gcs_to_bq()
+    define_schema_and_upload_to_gcs()
+    load_data_gcs_to_bq()
     logging.info('Task completed\n\n')
 
