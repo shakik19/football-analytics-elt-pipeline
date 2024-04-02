@@ -3,6 +3,7 @@ dataset
 __pycache__
 main/vars_local.py
 *.log
+terraform/var_local.tf
 
 
 
