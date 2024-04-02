@@ -1,3 +1,5 @@
 .*
 dataset
 __pycache__
+main/vars_local.py
+*.log
