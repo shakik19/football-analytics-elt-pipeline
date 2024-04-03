@@ -1,28 +1,11 @@
-import schemas
 import variables
 import os
 import logging
-import pandas as pd
-import pyarrow as pa
 import pyarrow.parquet as pq
-from datetime import datetime
-from pyarrow import fs
+from pyarrow import fs, csv
 from kaggle.api.kaggle_api_extended import KaggleApi
 from google.cloud import bigquery
 
-
-"""
-Function: download_dataset
-
-Description:
-This function downloads files from a Kaggle dataset and extracts them to a specified directory.
-
-Behavior:
-1. Specifies the name of the Kaggle dataset and the destination directory.
-2. Authenticates the Kaggle API.
-3. Downloads files from the specified dataset to the destination directory.
-4. Extracts the downloaded files if they are zipped.
-"""
 
 def download_dataset():
     dataset_name= "davidcariboo/player-scores"
@@ -33,53 +16,20 @@ def download_dataset():
     api.dataset_download_files(dataset_name, path=destination_dir, unzip=True)
 
 
-"""
-Function: define_schema
-
-Description:
-This function defines a schema for a given CSV file and returns a pandas DataFrame with the specified schema.
-
-Parameters:
-- file_name (str): Name of the CSV file.
-  
-Returns:
-- pd.DataFrame: DataFrame with the defined schema.
-"""
-
-def define_schema(file_name: str) -> pd.DataFrame:
-    path = f'{variables.RAW_DATASET_DIR}{file_name.lower()}.csv'
-    schema_class = getattr(schemas, file_name)
-
-    logging.info(f'Setting schema for {file_name}')
-    return pd.read_csv(path, dtype=schema_class.schema,
-                       parse_dates=schema_class.date_cols)
-
-
-"""
-Function: define_schema_and_upload_to_gcs
-
-Description:
-This function sets schemas for CSV files, converts them to Arrow tables, and uploads them to Google Cloud Storage (GCS) in Parquet format.
-
-Behavior:
-1. Sets Google Cloud credentials.
-2. Iterates through CSV files defined in the schema class.
-3. Converts CSV data to an Arrow table with the defined schema.
-4. Uploads the Arrow table from memory to GCS in Parquet format under a specified path.
-"""
-
-def define_schema_and_upload_to_gcs():
+def upload_to_gcs():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = variables.SERVICE_ACC_PATH
 
     target_fs = fs.GcsFileSystem()
     bucket_name = variables.BUCKET_NAME
 
-    for file_name in schemas.class_names:
-        arrow_table = pa.Table.from_pandas(define_schema(file_name))
-        logging.info(f'Set schema of {file_name} and parsed to Arrow table')
+    for file_name in variables.tables:
+        path = f'{variables.RAW_DATASET_DIR}{file_name}.csv'
+        arrow_table = csv.read_csv(path,
+                                   csv.ReadOptions(use_threads=True,
+                                                   block_size=1000))
+        logging.info(f'Parsed {file_name} to Arrow table')
 
-        current_date = datetime.now().strftime('%m-%Y')
-        gcs_path = f'{bucket_name}/{current_date}/{file_name.lower()}.parquet'
+        gcs_path = f'{bucket_name}/raw/{file_name.lower()}.parquet'
 
         with target_fs.open_output_stream(gcs_path) as out:
             logging.info(f'Opened GCS output stream with path: gs://{gcs_path}')
@@ -90,40 +40,24 @@ def define_schema_and_upload_to_gcs():
                 logging.error(f'Couldn\'t write to {gcs_path}')
 
 
-"""
-Function: load_data_gcs_to_bq
-
-Description:
-This function loads data from Google Cloud Storage (GCS) into BigQuery tables.
-
-Behavior:
-1. Sets Google Cloud credentials.
-2. Initializes a BigQuery client.
-3. Retrieves the current date.
-4. Iterates through the class names defined in the schema.
-5. Constructs a SQL query to load data from GCS into BigQuery tables.
-6. Executes the SQL query to load data into BigQuery.
-"""
-
-def load_data_gcs_to_bq():
+def create_bq_seed_dataset():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = variables.SERVICE_ACC_PATH
     dataset_name = variables.DATASET_NAME
     bucket_name = variables.BUCKET_NAME
     client = bigquery.Client()
-    date = datetime.now().strftime('%m-%Y')
     
-    for table_name in schemas.class_names:
-        table_name = table_name.lower()
+    for table_name in variables.tables:
         query = f"""
-            LOAD DATA OVERWRITE {dataset_name}.{table_name}
-            FROM FILES (
+            CREATE OR REPLACE EXTERNAL TABLE {dataset_name}.{table_name}
+            OPTIONS (
             format = 'PARQUET',
-            uris = ['gs://{bucket_name}/{date}/{table_name}.parquet']);
+            uris = ['gs://{bucket_name}/raw/{table_name}.parquet']
+            );
         """
 
         logging.info(f'Loading {table_name} table')
         try:
-            client.query(query)
+            client.query_and_wait(query)
             logging.info(f'Successfully loaded {table_name} table\n')
         except TypeError as e:
             logging.error(e)
@@ -147,7 +81,7 @@ if __name__ == '__main__':
                         format='%(asctime)s %(name)s - %(levelname)s - %(message)s',
                         handlers=[logging.FileHandler('app.log'), logging.StreamHandler()])
     logging.info("START")
-    define_schema_and_upload_to_gcs()
-    load_data_gcs_to_bq()
+    upload_to_gcs()
+    create_bq_seed_dataset()
     logging.info('Task completed\n\n')
 
