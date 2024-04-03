@@ -1,0 +1,23 @@
+select
+    player_id,
+    first_name,
+    last_name,
+    name,
+    last_season,
+    current_club_id,
+    DATE_DIFF(CURRENT_DATE(), date_of_birth, YEAR) as age,
+    date_of_birth,
+    country_of_birth,
+    city_of_birth,
+    country_of_citizenship,
+    sub_position,
+    position,
+    foot,
+    height_in_cm,
+    agent_name,
+    {{ dbt.safe_cast("contract_expiration_date", api.Column.translate_type("date")) }} as contract_expiration_date,
+    current_club_domestic_competition_id,
+    current_club_name,
+    market_value_in_eur,
+    highest_market_value_in_eur
+from {{ source("raw", "players") }}
