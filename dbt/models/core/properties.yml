@@ -14,6 +14,21 @@ models:
       materialized: table
       cluster_by: [position, current_market_value_in_eur]
 
+
+
+
+  # For some reasons dbt is unable to parse partition config from here so added it 
+  # directly to the model's file
+
+  # - name: fact_appearances
+  #   config:
+  #     materialized: table
+  #     cluster_by: [player_club_id, player_current_club_id]
+  #     partition_by:
+  #       - field: match_date
+  #       - data_type: date
+  #       - granularity: month
+
   # - name: dim_player_valuations
   #   config:
   #     materialized: incremental
