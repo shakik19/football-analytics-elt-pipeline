@@ -13,6 +13,11 @@ models:
     config:
       materialized: table
       cluster_by: [position, current_market_value_in_eur]
+  
+  - name: fact_games
+    config:
+      materialized: incremental
+      cluster_by: [season, competition_id]
 
 
 
