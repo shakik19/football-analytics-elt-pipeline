@@ -19,6 +19,14 @@ models:
       materialized: incremental
       cluster_by: [season, competition_id]
 
+  - name: fact_game_lineups
+    config:
+      materialized: incremental
+      cluster_by: [player_id, playing_position]
+
+
+
+
 
 
 
