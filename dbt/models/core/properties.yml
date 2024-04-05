@@ -24,6 +24,11 @@ models:
       materialized: incremental
       cluster_by: [player_id, playing_position]
 
+  - name: fact_club_games
+    config:
+      materialized: table
+      cluster_by: club_id
+
 
 
 
