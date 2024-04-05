@@ -32,7 +32,7 @@ models:
   - name: fact_game_events
     config:
       materialized: incremental
-      cluster_by: [game_id, minute]
+      cluster_by: [game_id, clock]
 
 
 
