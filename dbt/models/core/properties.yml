@@ -28,6 +28,11 @@ models:
     config:
       materialized: table
       cluster_by: club_id
+  
+  - name: fact_game_events
+    config:
+      materialized: incremental
+      cluster_by: [game_id, minute]
 
 
 
