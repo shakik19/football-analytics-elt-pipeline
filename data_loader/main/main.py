@@ -1,4 +1,4 @@
-import variables
+import data_loader.main.variables as variables
 import os
 import logging
 import pyarrow.parquet as pq
