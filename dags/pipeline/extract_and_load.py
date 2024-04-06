@@ -6,6 +6,11 @@ from pyarrow import fs, csv
 from kaggle.api.kaggle_api_extended import KaggleApi
 from google.cloud import bigquery
 
+logging.basicConfig(level=logging.INFO,
+                    datefmt='%m-%d %H:%M',
+                    format='%(asctime)s %(name)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler('app.log'), logging.StreamHandler()])
+
 
 def download_dataset():
     dataset_name= "davidcariboo/player-scores"
@@ -73,15 +78,3 @@ def clean_csvs():
         if os.path.isfile(file_path):
             os.remove(file_path)
             logging.info(f"Deleted {file_path}")
-
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO,
-                        datefmt='%m-%d %H:%M',
-                        format='%(asctime)s %(name)s - %(levelname)s - %(message)s',
-                        handlers=[logging.FileHandler('app.log'), logging.StreamHandler()])
-    logging.info("START")
-    upload_to_gcs()
-    create_bq_seed_dataset()
-    logging.info('Task completed\n\n')
-
