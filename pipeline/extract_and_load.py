@@ -5,8 +5,7 @@ import logging
 import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
-from pathlib import Path
-from google.cloud.storage import Client, transfer_manager
+from pyarrow import fs
 from kaggle.api.kaggle_api_extended import KaggleApi
 from google.cloud import bigquery
 from prefect import flow, task
@@ -34,43 +33,71 @@ def define_schema(file_name: str) -> pd.DataFrame:
     return pd.read_csv(path, dtype=schema_class.schema)
 
 
-@task(name="process-raw", retries=2, log_prints=True)
-def write_to_parquet():
+@task(name="process-load-datalake", retries=2, log_prints=True)
+def process_and_load_datalake():
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
+
+    target_fs = fs.GcsFileSystem()
+    bucket_name = pvars.BUCKET_NAME
+
     for file_name in pvars.tables:
         table = pa.Table.from_pandas(define_schema(file_name=file_name))
-        dest_filename = f"{pvars.PARQUET_DIR}/{file_name.lower()}.parquet"
-        pq.write_table(table, dest_filename)
+        logging.info(f'Parsed {file_name} to Arrow table')
+        
+        gcs_path = f'{bucket_name}/{file_name.lower()}.parquet'
+
+        with target_fs.open_output_stream(gcs_path) as out:
+            logging.info(f'Opened GCS output stream with path: gs://{gcs_path}')
+            try:
+                pq.write_table(table, out)
+                logging.info(f'Wrote file {file_name.lower()}.parquet\n')
+            except Exception as e:
+                logging.error(f'Couldn\'t write to {gcs_path}')
 
 
-@task(name="load-datalake", retries=2, log_prints=True)
-def upload_parquet_dir():
-    bucket_name = pvars.BUCKET_NAME
-    source_directory = pvars.PARQUET_DIR
+# An alternative way to load datalake (much faster but 
+# for some reason flow stops after uploading)
 
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
-    storage_client = Client()
-    bucket = storage_client.bucket(bucket_name)
+# @task(name="process-raw", retries=2, log_prints=True)
+# def write_to_parquet():
+#     for file_name in pvars.tables:
+#         table = pa.Table.from_pandas(define_schema(file_name=file_name))
+#         dest_filename = f"{pvars.PARQUET_DIR}/{file_name.lower()}.parquet"
+#         pq.write_table(table, dest_filename)
 
-    directory_as_path_obj = Path(source_directory)
-    paths = directory_as_path_obj.rglob("*")
+# @task(name="process-load-datalake", retries=2, log_prints=True)
+# def upload_parquet_dir():
 
-    file_paths = [path for path in paths if path.is_file()]
+#     from pathlib import Path
+#     from google.cloud.storage import Client, transfer_manager
 
-    relative_paths = [path.relative_to(source_directory) for path in file_paths]
+#     bucket_name = pvars.BUCKET_NAME
+#     source_directory = pvars.PARQUET_DIR
 
-    string_paths = [str(path) for path in relative_paths]
+#     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
+#     storage_client = Client()
+#     bucket = storage_client.bucket(bucket_name)
 
-    logging.info("Found {} files.".format(len(string_paths)))
+#     directory_as_path_obj = Path(source_directory)
+#     paths = directory_as_path_obj.rglob("*")
 
-    results = transfer_manager.upload_many_from_filenames(
-        bucket, string_paths, source_directory=source_directory, max_workers=6
-    )
+#     file_paths = [path for path in paths if path.is_file()]
 
-    for name, result in zip(string_paths, results):
-        if isinstance(result, Exception):
-            print("Failed to upload {} due to exception: {}".format(name, result))
-        else:
-            logging.info("Uploaded {} to {}.".format(name, bucket.name))
+#     relative_paths = [path.relative_to(source_directory) for path in file_paths]
+
+#     string_paths = [str(path) for path in relative_paths]
+
+#     logging.info("Found {} files.".format(len(string_paths)))
+
+#     results = transfer_manager.upload_many_from_filenames(
+#         bucket, string_paths, source_directory=source_directory, max_workers=6
+#     )
+
+#     for name, result in zip(string_paths, results):
+#         if isinstance(result, Exception):
+#             print("Failed to upload {} due to exception: {}".format(name, result))
+#         else:
+#             logging.info("Uploaded {} to {}.".format(name, bucket.name))
 
 
 @task(name="load-warehouse", retries=2, log_prints=True)
@@ -111,13 +138,14 @@ def clean_filse():
                 os.remove(file_path)
                 logging.info(f"Deleted {file_path}")
 
+
 @flow(name="main-flow", retries=2, log_prints=True)
 def main_flow():
     # download_dataset()
-    # write_to_parquet()
-    # upload_parquet_dir()
+    process_and_load_datalake()
     create_bq_seed_dataset()
-    clean_filse()
+    # clean_filse()
+
 
 if __name__ == "__main__":
     main_flow()
