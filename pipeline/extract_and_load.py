@@ -8,7 +8,8 @@ import pyarrow as pa
 from pathlib import Path
 from google.cloud.storage import Client, transfer_manager
 from kaggle.api.kaggle_api_extended import KaggleApi
-from google.cloud import bigquery, storage
+from google.cloud import bigquery
+from prefect import flow, task
 
 logging.basicConfig(level=logging.INFO,
                     datefmt='%m-%d %H:%M',
@@ -16,6 +17,7 @@ logging.basicConfig(level=logging.INFO,
                     handlers=[logging.FileHandler('app.log'), logging.StreamHandler()])
 
 
+@task(name="extract-data", retries=2, log_prints=True)
 def download_dataset():
     dataset_name= "davidcariboo/player-scores"
     destination_dir= pvars.RAW_DATASET_DIR
@@ -31,6 +33,8 @@ def define_schema(file_name: str) -> pd.DataFrame:
     logging.info(f'Setting schema for {file_name}')
     return pd.read_csv(path, dtype=schema_class.schema)
 
+
+@task(name="process-raw", retries=2, log_prints=True)
 def write_to_parquet():
     for file_name in pvars.tables:
         table = pa.Table.from_pandas(define_schema(file_name=file_name))
@@ -38,7 +42,8 @@ def write_to_parquet():
         pq.write_table(table, dest_filename)
 
 
-def upload_directory_with_transfer_manager():
+@task(name="load-datalake", retries=2, log_prints=True)
+def upload_parquet_dir():
     bucket_name = pvars.BUCKET_NAME
     source_directory = pvars.PARQUET_DIR
 
@@ -68,6 +73,7 @@ def upload_directory_with_transfer_manager():
             logging.info("Uploaded {} to {}.".format(name, bucket.name))
 
 
+@task(name="load-warehouse", retries=2, log_prints=True)
 def create_bq_seed_dataset():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
     dataset_name = pvars.DATASET_NAME
@@ -92,6 +98,7 @@ def create_bq_seed_dataset():
             logging.error(e)
 
 
+@task(name="clean-local", retries=2, log_prints=True)
 def clean_filse():
     dir_paths = [pvars.RAW_DATASET_DIR, pvars.PARQUET_DIR]
 
@@ -104,10 +111,13 @@ def clean_filse():
                 os.remove(file_path)
                 logging.info(f"Deleted {file_path}")
 
-
-if __name__ == "__main__":
+@flow(name="main-flow", retries=2, log_prints=True)
+def main_flow():
     download_dataset()
     write_to_parquet()
-    upload_directory_with_transfer_manager()
+    upload_parquet_dir()
     create_bq_seed_dataset()
-    # clean_filse()
+    clean_filse()
+
+if __name__ == "__main__":
+    main_flow()
