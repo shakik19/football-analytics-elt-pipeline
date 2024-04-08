@@ -1,4 +1,4 @@
-import variables
+import pipeline.variables as pvars
 import os
 import logging
 import pyarrow.parquet as pq
@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO,
 
 def download_dataset():
     dataset_name= "davidcariboo/player-scores"
-    destination_dir= variables.RAW_DATASET_DIR
+    destination_dir= pvars.RAW_DATASET_DIR
 
     api = KaggleApi()
     api.authenticate()
@@ -22,13 +22,13 @@ def download_dataset():
 
 
 def upload_to_gcs():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = variables.SERVICE_ACC_PATH
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
 
     target_fs = fs.GcsFileSystem()
-    bucket_name = variables.BUCKET_NAME
+    bucket_name = pvars.BUCKET_NAME
 
-    for file_name in variables.tables:
-        path = f'{variables.RAW_DATASET_DIR}{file_name}.csv'
+    for file_name in pvars.tables:
+        path = f'{pvars.RAW_DATASET_DIR}{file_name}.csv'
         arrow_table = csv.read_csv(path,
                                    csv.ReadOptions(use_threads=True,
                                                    block_size=1000))
@@ -46,12 +46,12 @@ def upload_to_gcs():
 
 
 def create_bq_seed_dataset():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = variables.SERVICE_ACC_PATH
-    dataset_name = variables.DATASET_NAME
-    bucket_name = variables.BUCKET_NAME
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
+    dataset_name = pvars.DATASET_NAME
+    bucket_name = pvars.BUCKET_NAME
     client = bigquery.Client()
     
-    for table_name in variables.tables:
+    for table_name in pvars.tables:
         query = f"""
             CREATE OR REPLACE EXTERNAL TABLE {dataset_name}.{table_name}
             OPTIONS (
@@ -69,7 +69,7 @@ def create_bq_seed_dataset():
 
 
 def clean_csvs():
-    dir_path = variables.RAW_DATASET_DIR
+    dir_path = pvars.RAW_DATASET_DIR
 
     logging.info("Cleaning raw csv files")
     for filename in os.listdir(dir_path):

@@ -9,3 +9,5 @@ NOTE: Start documentation sequence from what would happen when you run the
         DATASET, VM & Bucket through Terraform script.
 
 TODO: ADD terraform installation script to setup.sh
+
+TODO: ADD multi-threading in extractor and loader
