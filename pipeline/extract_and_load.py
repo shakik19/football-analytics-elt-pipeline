@@ -68,7 +68,7 @@ def upload_parquet_dir():
 
     for name, result in zip(string_paths, results):
         if isinstance(result, Exception):
-            logging.info("Failed to upload {} due to exception: {}".format(name, result))
+            print("Failed to upload {} due to exception: {}".format(name, result))
         else:
             logging.info("Uploaded {} to {}.".format(name, bucket.name))
 
@@ -113,9 +113,9 @@ def clean_filse():
 
 @flow(name="main-flow", retries=2, log_prints=True)
 def main_flow():
-    download_dataset()
-    write_to_parquet()
-    upload_parquet_dir()
+    # download_dataset()
+    # write_to_parquet()
+    # upload_parquet_dir()
     create_bq_seed_dataset()
     clean_filse()
 
