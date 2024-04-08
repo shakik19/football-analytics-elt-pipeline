@@ -2,7 +2,7 @@ WITH
 last_updates AS(
     SELECT
         player_id,
-        MAX(date) AS last_updated_at
+        MAX({{ dbt.safe_cast("date", api.Column.translate_type("date")) }}) AS last_updated_at
     FROM
         {{ source("raw", "player_valuations") }}
     GROUP BY
@@ -11,7 +11,7 @@ last_updates AS(
 values_of_each AS(
     SELECT
         player_id,
-        date,
+        {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} AS date,
         market_value_in_eur
     FROM
         {{ source("raw", "player_valuations") }}
@@ -45,8 +45,7 @@ players AS(
         name,
         last_season,
         current_club_id,
-        DATE_DIFF(CURRENT_DATE(), date_of_birth, YEAR) as age,
-        date_of_birth,
+        {{ dbt.safe_cast("date_of_birth", api.Column.translate_type("date")) }} AS date_of_birth,
         country_of_birth,
         city_of_birth,
         country_of_citizenship,
@@ -68,7 +67,7 @@ SELECT
     players.name,
     players.last_season,
     players.current_club_id,
-    players.age,
+    DATE_DIFF(CURRENT_DATE(), players.date_of_birth, YEAR) AS age,
     players.date_of_birth,
     players.country_of_birth,
     players.city_of_birth,

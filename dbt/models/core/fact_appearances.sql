@@ -18,7 +18,7 @@ WITH cte_appearances AS(
         player_club_id,
         player_current_club_id,
         competition_id,
-        date AS match_date,
+        {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} AS match_date,
         player_name,
         yellow_cards,
         red_cards,

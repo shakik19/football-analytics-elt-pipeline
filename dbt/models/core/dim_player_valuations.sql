@@ -13,7 +13,7 @@
 WITH cte_player_vals AS(
     SELECT
         player_id,
-        date AS ingestion_time,
+        {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} AS ingestion_time,
         market_value_in_eur,
         current_club_id,
         player_club_domestic_competition_id

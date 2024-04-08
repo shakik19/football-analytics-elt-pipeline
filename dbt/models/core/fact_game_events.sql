@@ -1,7 +1,7 @@
 WITH cte_game_events AS(
     SELECT
         game_event_id,
-        date AS ingestion_date,
+        {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} AS ingestion_date,
         game_id,
         minute AS clock,
         type,

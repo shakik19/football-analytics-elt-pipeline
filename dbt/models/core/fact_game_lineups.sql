@@ -2,7 +2,7 @@ WITH cte_game_lineups AS(
     SELECT
         game_lineups_id,
         game_id,
-        date AS match_date,
+        {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} AS match_date,
         player_id,
         club_id,
         player_name,

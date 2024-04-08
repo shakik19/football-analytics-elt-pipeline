@@ -4,7 +4,7 @@ WITH cte_games AS(
         competition_id,
         season,
         round AS match_day,
-        date as game_date,
+        {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} as game_date,
         home_club_id,
         away_club_id,
         home_club_goals,
