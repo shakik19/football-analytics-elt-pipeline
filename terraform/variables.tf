@@ -1,11 +1,11 @@
 variable "credentials" {
   description = "Your project's gcp credentials file path(absolute path recommended)"
-  default = ""
+  default = "./creds/gcp_key.json"
 }
 
 variable "project" {
   description = "Project id"
-  default = ""
+  default = "fast-forward-412713"
 }
 
 variable "region" {
@@ -14,12 +14,12 @@ variable "region" {
   e.g. us-west1
   EOT
 
-  default = ""
+  default = "us-west1"
 }
 
 variable "location" {
   description = "Project location"
-  default = ""
+  default = "US"
 }
 
 variable "bq_dataset_id" {
@@ -28,7 +28,7 @@ variable "bq_dataset_id" {
   naming convention
   EOT
 
-  default = ""
+  default = "transfermarkt_seed"
 }
 
 variable "gcs_bucket_name" {
@@ -37,5 +37,5 @@ variable "gcs_bucket_name" {
   detail naming convention
   EOT
 
-  default = ""
+  default = "transfermarkt-data"
 }
