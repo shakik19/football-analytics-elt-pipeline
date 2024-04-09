@@ -1,0 +1,13 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: fast-forward-412713
+      dataset: transfermarkt_core
+      threads: 6
+      keyfile: ../credentials/gcp_key.json
+      timeout_seconds: 300
+      priority: interactive
+      retries: 1
