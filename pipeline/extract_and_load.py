@@ -55,50 +55,6 @@ def process_and_load_datalake():
                 logging.error(f'Couldn\'t write to {gcs_path}')
 
 
-# An alternative way to load datalake (much faster but 
-# for some reason flow stops after uploading)
-
-# @task(name="process-raw", retries=2, log_prints=True)
-# def write_to_parquet():
-#     for file_name in pvars.tables:
-#         table = pa.Table.from_pandas(define_schema(file_name=file_name))
-#         dest_filename = f"{pvars.PARQUET_DIR}/{file_name.lower()}.parquet"
-#         pq.write_table(table, dest_filename)
-
-# @task(name="process-load-datalake", retries=2, log_prints=True)
-# def upload_parquet_dir():
-
-#     from pathlib import Path
-#     from google.cloud.storage import Client, transfer_manager
-
-#     bucket_name = pvars.BUCKET_NAME
-#     source_directory = pvars.PARQUET_DIR
-
-#     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
-#     storage_client = Client()
-#     bucket = storage_client.bucket(bucket_name)
-
-#     directory_as_path_obj = Path(source_directory)
-#     paths = directory_as_path_obj.rglob("*")
-
-#     file_paths = [path for path in paths if path.is_file()]
-
-#     relative_paths = [path.relative_to(source_directory) for path in file_paths]
-
-#     string_paths = [str(path) for path in relative_paths]
-
-#     logging.info("Found {} files.".format(len(string_paths)))
-
-#     results = transfer_manager.upload_many_from_filenames(
-#         bucket, string_paths, source_directory=source_directory, max_workers=6
-#     )
-
-#     for name, result in zip(string_paths, results):
-#         if isinstance(result, Exception):
-#             print("Failed to upload {} due to exception: {}".format(name, result))
-#         else:
-#             logging.info("Uploaded {} to {}.".format(name, bucket.name))
-
 
 @task(name="load-warehouse", retries=2, log_prints=True)
 def create_bq_seed_dataset():
@@ -123,6 +79,7 @@ def create_bq_seed_dataset():
             logging.info(f'Successfully loaded {table_name} table\n')
         except TypeError as e:
             logging.error(e)
+
 
 
 @task(name="clean-local", retries=2, log_prints=True)
