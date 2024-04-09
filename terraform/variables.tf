@@ -1,6 +1,6 @@
 variable "credentials" {
   description = "Your project's gcp credentials file path(absolute path recommended)"
-  default = "./creds/gcp_key.json"
+  default = "../credentials/gcp_key.json"
 }
 
 variable "project" {
@@ -22,13 +22,22 @@ variable "location" {
   default = "US"
 }
 
-variable "bq_dataset_id" {
+variable "bq_seed_dataset_id" {
   description = <<EOT
   A unique dataset id. Please check the official documentation for details
   naming convention
   EOT
 
   default = "transfermarkt_seed"
+}
+
+variable "bq_core_dataset_id" {
+  description = <<EOT
+  A unique dataset id. Please check the official documentation for details
+  naming convention
+  EOT
+
+  default = "transfermarkt_core"
 }
 
 variable "gcs_bucket_name" {
