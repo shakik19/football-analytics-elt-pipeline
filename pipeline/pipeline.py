@@ -10,9 +10,7 @@ from prefect_gcp import GcpCredentials
 from prefect import flow, task
 from prefect.logging import get_run_logger
 from prefect_dbt.cli import DbtCoreOperation
-
-
-logging = get_run_logger()
+from google.cloud import bigquery
 
 
 @task(name="extract-data", retries=2, log_prints=True)
@@ -26,6 +24,8 @@ def download_dataset():
 
 
 def define_schema(file_name: str) -> pd.DataFrame:
+    logging = get_run_logger()
+
     path = f'{pvars.RAW_DATASET_DIR}/{file_name.lower()}.csv'
     schema_class = getattr(schema, file_name)
     logging.info(f'Setting schema for {file_name}')
@@ -34,6 +34,8 @@ def define_schema(file_name: str) -> pd.DataFrame:
 
 @task(name="process-load-datalake", retries=2, log_prints=True)
 def process_and_load_datalake():
+    logging = get_run_logger()
+
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
 
     target_fs = fs.GcsFileSystem()
@@ -57,7 +59,10 @@ def process_and_load_datalake():
 
 @task(name="load-warehouse", retries=1, log_prints=True)
 def create_bq_seed_dataset():
-    client = GcpCredentials.load("gcp-key").get_bigquery_client()
+    logging = get_run_logger()
+
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = pvars.SERVICE_ACC_PATH
+    client = bigquery.Client()
     dataset_id = pvars.SEED_DATASET_NAME
     project_id = pvars.PROJECT_ID
     bucket_name = pvars.BUCKET_NAME
@@ -92,6 +97,8 @@ def trigger_dbt_flow() -> str:
 
 @task(name="clean-local", retries=2, log_prints=True)
 def clean_filse():
+    logging = get_run_logger()
+
     dir_paths = [pvars.RAW_DATASET_DIR, pvars.PARQUET_DIR]
 
     logging.info("Cleaning csv and parquet files")
@@ -106,8 +113,8 @@ def clean_filse():
 
 @flow(name="main-flow", log_prints=True)
 def main_flow():
-    download_dataset()
-    process_and_load_datalake()
+    # download_dataset()
+    # process_and_load_datalake()
     create_bq_seed_dataset()
     trigger_dbt_flow()
     # clean_filse()
