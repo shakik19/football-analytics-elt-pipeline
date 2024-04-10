@@ -6,7 +6,6 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 from pyarrow import fs
 from kaggle.api.kaggle_api_extended import KaggleApi
-from prefect_gcp import GcpCredentials
 from prefect import flow, task
 from prefect.logging import get_run_logger
 from prefect_dbt.cli import DbtCoreOperation
