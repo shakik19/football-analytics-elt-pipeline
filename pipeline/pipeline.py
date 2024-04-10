@@ -23,11 +23,8 @@ def download_dataset():
 
 
 def define_schema(file_name: str) -> pd.DataFrame:
-    logging = get_run_logger()
-
     path = f'{pvars.RAW_DATASET_DIR}/{file_name.lower()}.csv'
     schema_class = getattr(schema, file_name)
-    logging.info(f'Setting schema for {file_name}')
     return pd.read_csv(path, dtype=schema_class.schema)
 
 
