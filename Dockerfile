@@ -1,16 +1,12 @@
-FROM quay.io/astronomer/astro-runtime:10.6.0
+FROM prefecthq/prefect:2.16-python3.9
 
-# install dbt into a venv to avoid package dependency conflicts
-# WORKDIR "/usr/local/airflow"
-# COPY dbt-requirements.txt ./
-# RUN python -m virtualenv dbt_venv && source dbt_venv/bin/activate && \
-#     pip install --no-cache-dir -r dbt-requirements.txt && deactivate
+WORKDIR /opt/prefect
 
-# install data extractor and loader dependencies into a venv to avoid package dependency conflicts
-WORKDIR "/usr/local/airflow"
-RUN python -m virtualenv el_venv && source el_venv/bin/activate && \
-    pip install --no-cache-dir -r el-requirements.txt && deactivate
+COPY docker-requirements.txt ./
+COPY ./dbt ./dbt
+COPY ./credentials ./credentials
+COPY ./pipeline ./pipeline
+COPY .kaggle /root/.kaggle
 
-WORKDIR "/usr/local/airflow"
-RUN python -m virtualenv el_venv && source el_venv/bin/activate && \
-    pip install -r el-requirements.txt && deactivate
+RUN pip install -r docker-requirements.txt \
+    --trusted-host pypi.python.org --no-cache-dir
