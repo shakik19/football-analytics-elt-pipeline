@@ -95,16 +95,13 @@ def trigger_dbt_flow() -> str:
 def clean_filse():
     logging = get_run_logger()
 
-    dir_paths = [pvars.RAW_DATASET_DIR, pvars.PARQUET_DIR]
+    logging.info("Cleaning csv files")
+    for filename in os.listdir(pvars.RAW_DATASET_DIR):
+        file_path = os.path.join(dir_path, filename)
 
-    logging.info("Cleaning csv and parquet files")
-    for dir_path in dir_paths:
-        for filename in os.listdir(dir_path):
-            file_path = os.path.join(dir_path, filename)
-
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-                logging.info(f"Deleted {file_path}")
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            logging.info(f"Deleted {file_path}")
 
 
 @flow(name="main-flow", log_prints=True)
