@@ -109,11 +109,11 @@ def clean_filse():
 
 @flow(name="main-flow", log_prints=True)
 def main_flow():
-    # download_dataset()
-    # process_and_load_datalake()
+    download_dataset()
+    process_and_load_datalake()
     create_bq_seed_dataset()
     trigger_dbt_flow()
-    # clean_filse()
+    clean_filse()
 
 
 if __name__ == "__main__":
