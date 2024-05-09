@@ -17,12 +17,14 @@ models:
   - name: fact_games
     config:
       materialized: incremental
+      unique_key: game_id
       cluster_by: [season, competition_id]
 
   - name: fact_game_lineups
     config:
       materialized: incremental
-      cluster_by: [player_id, playing_position]
+      unique_key: game_lineups_id
+      cluster_by: [game_id]
 
   - name: fact_club_games
     config:
@@ -32,6 +34,7 @@ models:
   - name: fact_game_events
     config:
       materialized: incremental
+      unique_key: game_event_id
       cluster_by: [game_id, clock]
 
 
