@@ -1,11 +1,11 @@
 variable "credentials" {
   description = "Your project's gcp credentials file path(absolute path recommended)"
-  default = "../credentials/gcp_key.json"
+  default = "../.keys/gcp_key.json"
 }
 
 variable "project" {
   description = "Project id"
-  default = "fast-forward-412713"
+  default = "data-pipeline-7"
 }
 
 variable "region" {
