@@ -8,6 +8,10 @@ models:
   - name: dim_competitions
     config:
       materialized: table
+  
+  - name: dim_countries
+    config:
+      materialized: table
 
   - name: dim_players
     config:
@@ -36,6 +40,7 @@ models:
       materialized: incremental
       unique_key: game_event_id
       cluster_by: [game_id, clock]
+
 
 
 

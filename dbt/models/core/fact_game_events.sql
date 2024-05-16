@@ -3,15 +3,15 @@ WITH cte_game_events AS(
         game_event_id,
         {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} AS ingestion_date,
         game_id,
-        minute AS clock,
-        type,
+        src.minute AS clock,
+        src.type,
         club_id,
         player_id,
         description,
         player_in_id,
         player_assist_id
     FROM
-        {{ source("raw", "game_events") }}
+        {{ source("raw", "game_events") }} src
 )
 
 SELECT
