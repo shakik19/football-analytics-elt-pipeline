@@ -1,10 +1,10 @@
 import os
 import logging
 import time
+import threading
 from dotenv import load_dotenv
 from google.cloud.storage import Client, transfer_manager
 from google.cloud import bigquery
-from helper import PipelineHelper
 
 
 class DataLoader:
@@ -21,10 +21,8 @@ class DataLoader:
             'games',
             'player_valuations',
             'players']
-        self.DATASET_DIR = "../dataset"
-        self.google_application_credentials = os.getenv("SERVICE_ACC_PATH")
+        self.DATASET_DIR = os.environ.get("DATASET_DIR")
         self.bucket_name = os.getenv("BUCKET_NAME")
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = self.google_application_credentials
 
     def upload_to_gcs(self):
         filenames = [f"{filename}.parquet" for filename in self.TABLES]
@@ -39,7 +37,7 @@ class DataLoader:
             bucket,
             filenames,
             source_directory=source_dir,
-            worker_type=transfer_manager.PROCESS,
+            worker_type=transfer_manager.THREAD,
             max_workers=6,
         )
         end = time.perf_counter()
@@ -74,5 +72,11 @@ class DataLoader:
             self.logger.error(e)
 
     def load_bigquery_seed_dataset(self):
-        helper = PipelineHelper()
-        helper.run_using_threads(self.TABLES, self.load_into_bigquery)
+        threads = []
+        for table in self.TABLES:
+            thread =  threading.Thread(target=self.load_into_bigquery,
+                                       args=[table])
+            threads.append(thread)
+            thread.start()
+        for thread in threads:
+            thread.join()
