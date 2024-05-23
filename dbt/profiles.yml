@@ -1,5 +1,5 @@
 default:
-  target: dev
+  target: "{{ env_var('DBT_PROFILES_TARGET') }}"
   outputs:
     dev:
       type: bigquery
