@@ -4,10 +4,10 @@ default:
     dev:
       type: bigquery
       method: service-account
-      project: data-pipeline-7
-      dataset: transfermarkt_core
+      project: "{{ env_var('PROJECT_ID') }}"
+      dataset: "{{ env_var('CORE_DATASET_NAME') }}"
       threads: 4
-      keyfile: ../.keys/gcp_key.json
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
       timeout_seconds: 300
       priority: interactive
       retries: 1
