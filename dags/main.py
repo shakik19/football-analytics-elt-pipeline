@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -5,6 +6,12 @@ from airflow.operators.empty import EmptyOperator
 from include.extractor import DatasetDownloader
 from include.transformer import DataTransformer
 from include.loader import DataLoader
+from cosmos import (DbtTaskGroup,
+                    ProjectConfig,
+                    ProfileConfig,
+                    ExecutionConfig,
+                    RenderConfig)
+from cosmos.constants import TestBehavior
 
 
 with DAG(
@@ -12,7 +19,7 @@ with DAG(
     description="Transfermarkt ELT data pipeline",
     start_date=datetime(2024, 1, 1),
     schedule_interval=None,
-    tags=["elt", "gcp", "dbt"],
+    tags=["transfermarkt", "ELT", "gcp", "bigquery", "cloud_storage","dbt"],
     catchup=False
 ):
     start = EmptyOperator(task_id="start")
@@ -22,8 +29,8 @@ with DAG(
     Get data from kaggle api in csv format 
     """
     t_extractor = DatasetDownloader()
-    extract_dataset = PythonOperator(
-        task_id="extract_dataset",
+    extract_raw_data = PythonOperator(
+        task_id="extract_raw_data",
         python_callable=t_extractor.download_dataset
     )
 
@@ -71,11 +78,40 @@ with DAG(
     [Transform]
     DBT transformation tasks
     """
+    DBT_PROJECT_DIR = os.environ.get("DBT_PROJECT_DIR")
+    DBT_EXE_PATH = os.environ.get("DBT_EXE_PATH")
 
+    PROJECT_CONFIG = ProjectConfig(
+        dbt_project_path=DBT_PROJECT_DIR
+    )
 
+    PROFILE_CONFIG = ProfileConfig(
+        profile_name=os.environ.get("DBT_PROFILES_NAME"),
+        target_name=os.environ.get("DBT_PROFILES_TARGET"),
+        profiles_yml_filepath=f"{DBT_PROJECT_DIR}/profiles.yml"
+    )
 
+    EXECUTION_CONFIG = ExecutionConfig(
+        dbt_executable_path=DBT_EXE_PATH,
+    )
+
+    RENDER_CONFIG = RenderConfig(
+        emit_datasets=False,
+        test_behavior=TestBehavior.AFTER_EACH,
+        dbt_deps=True
+    )
+
+    dbt_run_models = DbtTaskGroup(
+        group_id="dbt_run_models",
+        project_config=PROJECT_CONFIG,
+        profile_config=PROFILE_CONFIG,
+        execution_config=EXECUTION_CONFIG,
+        render_config=None
+    )
 
     end = EmptyOperator(task_id="end")
 
-    start >> extract_dataset >> pre_process_data >> convert_to_parquet
-    convert_to_parquet >> load_datalake >> load_seed_dataset >> end
+
+    start >> extract_raw_data >> pre_process_data >> convert_to_parquet
+    convert_to_parquet >> load_datalake >> load_seed_dataset
+    load_seed_dataset >> dbt_run_models >> end
