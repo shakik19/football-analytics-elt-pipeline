@@ -6,7 +6,7 @@ default:
       method: service-account
       project: "{{ env_var('PROJECT_ID') }}"
       dataset: "{{ env_var('CORE_DATASET_NAME') }}"
-      threads: 4
+      threads: 5
       keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
       timeout_seconds: 300
       priority: interactive
