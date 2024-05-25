@@ -6,7 +6,6 @@ variable "service_account" {
 
 variable "project_id" {
   description = "Project id"
-  default = "data-pipeline"
   type = string
 }
 
@@ -16,12 +15,10 @@ variable "region" {
   e.g. us-west1
   EOT
   type = string
-  default = "us-west1"
 }
 
 variable "location" {
   description = "Project location"
-  default = "US"
   type = string
 }
 
@@ -31,7 +28,6 @@ variable "seed_dataset_id" {
   naming convention
   EOT
 
-  default = "transfermarkt_seed"
   type = string
 }
 
@@ -41,7 +37,6 @@ variable "core_dataset_id" {
   naming convention
   EOT
 
-  default = "transfermarkt_core"
   type = string
 }
 
@@ -51,6 +46,5 @@ variable "bucket_name" {
   detail naming convention
   EOT
 
-  default = "transfermarkt-data"
   type = string
 }
