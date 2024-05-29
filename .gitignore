@@ -6,7 +6,8 @@ main/vars_local.py
 *.log
 terraform/var_local.tf
 *.json
-
+dbt_packages
+dbt/package-lock.yml
 
 # prefect ignore
 # prefect artifacts
