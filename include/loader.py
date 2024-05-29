@@ -8,31 +8,24 @@ from google.cloud import bigquery
 
 
 class DataLoader:
-    def __init__(self):
+    def __init__(self, project_name: str):
         load_dotenv()
         self.logger = logging.getLogger(__name__)
-        self.TABLES = [
-            'appearances',
-            'game_lineups',
-            'game_events',
-            'club_games',
-            'clubs',
-            'competitions',
-            'games',
-            'player_valuations',
-            'players']
+        self.PROJECT_NAME = project_name
         self.DATASET_DIR = os.environ.get("DATASET_DIR")
-        self.bucket_name = os.getenv("BUCKET_NAME")
+        self.PARQUET_DATASET_DIR = f"{self.DATASET_DIR}/{project_name}/parquet"
+        self.BUCKET_NAME = os.getenv("BUCKET_NAME")
+        self.TABLES = [file.split(".")[0] for file in os.listdir(self.PARQUET_DATASET_DIR) if file.endswith(".parquet")]
 
     def upload_to_gcs(self):
         filenames = [f"{filename}.parquet" for filename in self.TABLES]
-        source_dir = f"{self.DATASET_DIR}/parquet"
+        source_dir = self.PARQUET_DATASET_DIR
 
         storage_client = Client()
-        bucket = storage_client.bucket(self.bucket_name)
+        bucket = storage_client.bucket(self.BUCKET_NAME)
 
         start = time.perf_counter()
-        self.logger.info(f"Uploading parquet directory to {self.bucket_name} bucket...")
+        self.logger.info(f"Uploading parquet directory to {self.BUCKET_NAME} bucket...")
         results = transfer_manager.upload_many_from_filenames(
             bucket,
             filenames,
@@ -60,7 +53,7 @@ class DataLoader:
             LOAD DATA OVERWRITE `{project_id}.{dataset_name}.{table_name}`
             FROM FILES (
             format = 'PARQUET',
-            uris = ['gs://{self.bucket_name}/{table_name}.parquet']
+            uris = ['gs://{self.BUCKET_NAME}/{table_name}.parquet']
             );
         """
 
@@ -70,6 +63,7 @@ class DataLoader:
             self.logger.info(f'Successfully loaded {table_name} table')
         except TypeError as e:
             self.logger.error(e)
+
 
     def load_bigquery_seed_dataset(self):
         threads = []
