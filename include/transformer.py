@@ -11,7 +11,7 @@ class DataTransformer:
         self.PROJECT_DATASET_DIR = f"{self.DATASET_DIR}/{project_name}"
         self.CSV_DATASET_DIR = f"{self.PROJECT_DATASET_DIR}/csv"
         self.PARQUET_DATASET_DIR = f"{self.PROJECT_DATASET_DIR}/parquet"
-        self.TABLES = [file.split(".")[0] for file in os.listdir(self.CSV_DATASET_DIR)]
+        self.TABLES = [file.split(".")[0] for file in os.listdir(self.CSV_DATASET_DIR) if file.endswith(".csv")]
         self.logger = logging.getLogger(__name__)
 
 
