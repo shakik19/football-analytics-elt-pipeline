@@ -22,27 +22,34 @@ with DAG(
     tags=["transfermarkt", "ELT", "gcp", "bigquery", "cloud_storage","dbt"],
     catchup=False
 ):
+    PROJECT_NAME = "transfermarkt"
     start = EmptyOperator(task_id="start")
 
     """
     [Extraction] 
     Get data from kaggle api in csv format 
     """
-    t_extractor = DatasetDownloader()
+    dataset_name = "davidcariboo/player-scores"
+    t_extractor = DatasetDownloader(project_name=PROJECT_NAME)
     extract_raw_data = PythonOperator(
         task_id="extract_raw_data",
-        python_callable=t_extractor.download_dataset
+        python_callable=t_extractor.download_dataset,
+        op_args=[dataset_name]
     )
 
 
     """
     [Pre-transformation]
     Excluding some corrupt columns from the game_lineups.csv file
+    The schema is inconsistent in the "number" and "team_captain columns
     """
-    t_transformer = DataTransformer()
+    pt_columns = ["number", "team_captain"]
+    pt_filename = "game_lineups"
+    t_transformer = DataTransformer(project_name=PROJECT_NAME)
     pre_process_data = PythonOperator(
         task_id="pre_process_data",
-        python_callable=t_transformer.exclude_corrupt_columns
+        python_callable=t_transformer.exclude_corrupt_columns,
+        op_args=[pt_filename, pt_columns]
     )
 
     """
