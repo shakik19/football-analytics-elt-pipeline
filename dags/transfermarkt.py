@@ -65,7 +65,7 @@ with DAG(
     [Load]
     Uploading parquet files to Data Lake(Google Cloud Stroage) 
     """
-    t_loader = DataLoader()
+    t_loader = DataLoader(project_name=PROJECT_NAME)
     load_datalake = PythonOperator(
         task_id="load_datalake",
         python_callable=t_loader.upload_to_gcs,
@@ -116,9 +116,19 @@ with DAG(
         render_config=None
     )
 
+    """
+    END
+    Before ending clering the local csv and parquet files
+    """
+    clean_local_dataset = PythonOperator(
+        task_id = "clean_local_dataset",
+        python_callable=t_extractor.remove_all_in_path,
+        op_args=[os.environ.get("DATASET_DIR")]
+    )
+
     end = EmptyOperator(task_id="end")
 
 
     start >> extract_raw_data >> pre_process_data >> convert_to_parquet
     convert_to_parquet >> load_datalake >> load_seed_dataset
-    load_seed_dataset >> dbt_run_models >> end
+    load_seed_dataset >> dbt_run_models >> clean_local_dataset >> end
