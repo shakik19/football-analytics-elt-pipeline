@@ -19,21 +19,18 @@ class DataLoader:
 
     def upload_to_gcs(self):
         filenames = [f"{filename}.parquet" for filename in self.TABLES]
-        source_dir = self.PARQUET_DATASET_DIR
 
         storage_client = Client()
         bucket = storage_client.bucket(self.BUCKET_NAME)
 
-        start = time.perf_counter()
         self.logger.info(f"Uploading parquet directory to {self.BUCKET_NAME} bucket...")
         results = transfer_manager.upload_many_from_filenames(
             bucket,
             filenames,
-            source_directory=source_dir,
+            source_directory=self.PARQUET_DATASET_DIR,
             worker_type=transfer_manager.THREAD,
-            max_workers=6,
+            max_workers=5,
         )
-        end = time.perf_counter()
 
         for name, result in zip(filenames, results):
             if isinstance(result, Exception):
@@ -41,7 +38,6 @@ class DataLoader:
             else:
                 self.logger.info("Uploaded {} to {}.".format(name, bucket.name))
         self.logger.info(f"Finished upload_to_gcs job")
-        self.logger.info(f"Took: {(end - start):.2f}s")
 
 
     def load_into_bigquery(self, table_name: str):
