@@ -23,6 +23,4 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 seeds:
   transfermarkt_analytics:
-      country_codes:
-          +column_types:
-              country-code: numeric
+   +schema: country_codes
