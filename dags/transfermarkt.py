@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from include.extractor import DatasetDownloader
 from include.transformer import DataTransformer
@@ -120,10 +121,11 @@ with DAG(
     END
     Before ending clering the local csv and parquet files
     """
-    clean_local_dataset = PythonOperator(
+    project_dataset_path = f"{os.environ.get("DATASET_DIR")}/{PROJECT_NAME}"
+    bash_remove_command = f"rm -rf {project_dataset_path}"
+    clean_local_dataset = BashOperator(
         task_id = "clean_local_dataset",
-        python_callable=t_extractor.remove_all_in_path,
-        op_args=[os.environ.get("DATASET_DIR")]
+        bash_command=bash_remove_command
     )
 
     end = EmptyOperator(task_id="end")
