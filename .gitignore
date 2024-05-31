@@ -8,6 +8,7 @@ terraform/var_local.tf
 *.json
 dbt_packages
 dbt/package-lock.yml
+dbt_venv
 
 # prefect ignore
 # prefect artifacts
