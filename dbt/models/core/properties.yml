@@ -4,10 +4,24 @@ models:
   - name: dim_clubs
     config:
       materialized: table
+    columns:
+      - name: club_id
+        tests:
+          - unique
+          - not_null
+      - name: squad_size
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
 
   - name: dim_competitions
     config:
       materialized: table
+    columns:
+      - name: competition_id
+        tests:
+          - unique
+          - not_null
   
   - name: dim_countries
     config:
@@ -17,12 +31,34 @@ models:
     config:
       materialized: table
       cluster_by: [position, current_market_value_in_eur]
+    columns:
+      - name: player_id
+        tests:
+          - unique
+          - not_null
+      - name: age
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
   
   - name: fact_games
     config:
       materialized: incremental
       unique_key: game_id
       cluster_by: [season, competition_id]
+    columns:
+      - name: game_id
+        tests:
+          - unique
+          - not_null
+      - name: home_club_goals
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: away_club_goals
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
 
   - name: fact_game_lineups
     config:
@@ -40,17 +76,56 @@ models:
       materialized: incremental
       unique_key: game_event_id
       cluster_by: [game_id, clock]
-
-
-
-
-
+      
+  - name: dim_player_valuations
+    columns:
+      - name: market_value_in_eur
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: current_club_id
+        tests:
+          - not_null
+      
+  - name: fact_appearances
+    columns:
+      - name: appearance_id
+        tests:
+          - unique
+      - name: yellow_cards
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 2
+      - name: red_cards
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+      - name: goals
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: assists
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: minutes_played
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 150
 
 
 
   # For some reasons dbt is unable to parse partition config from here so added it 
   # directly to the model's file
-
   # - name: fact_appearances
   #   config:
   #     materialized: table
