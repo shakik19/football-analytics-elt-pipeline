@@ -24,23 +24,8 @@ class DatasetDownloader:
     def create_required_dirs(self):
         project_dataset_dir = f"{self.DATASET_DIR}/{self.PROJECT_NAME}"
         parquet_dir = f"{project_dataset_dir}/parquet"
-        csv_dir = f"{project_dataset_dir}/csv"   
+        csv_dir = f"{project_dataset_dir}/csv"
         directories = [self.DATASET_DIR, project_dataset_dir, parquet_dir, csv_dir]
 
         for directory in directories:
-            if not os.path.exists(directory):
-                os.mkdir(directory)
-
-    def remove_all_in_path(self, dataset_dir: str):
-        try:
-        # Check if the path exists
-            if os.path.exists(dataset_dir):
-                # Recursively remove the directory and all its contents
-                shutil.rmtree(dataset_dir)
-                self.logger.info(f"All files and directories in '{dataset_dir}' have been removed.")
-            else:
-                self.logger.info(f"The path '{dataset_dir}' does not exist.")
-        except PermissionError:
-            self.logger.warn(f"Permission denied to modify the path '{dataset_dir}'.")
-        except Exception as e:
-            self.logger.warn(f"An error occurred: {e}")
+            os.makedirs(directory, exist_ok=True)
