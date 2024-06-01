@@ -17,10 +17,6 @@ variable "region" {
   type = string
 }
 
-variable "location" {
-  description = "Project location"
-  type = string
-}
 
 variable "seed_dataset_id" {
   description = <<EOT
