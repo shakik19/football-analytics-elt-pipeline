@@ -8,23 +8,24 @@ from pyarrow import csv, parquet as pq
 class DataTransformer:
     def __init__(self, project_name: str):
         self.DATASET_DIR = os.environ.get("DATASET_DIR")
-        self.PROJECT_DATASET_DIR = f"{self.DATASET_DIR}/{project_name}"
-        self.CSV_DATASET_DIR = f"{self.PROJECT_DATASET_DIR}/csv"
-        self.PARQUET_DATASET_DIR = f"{self.PROJECT_DATASET_DIR}/parquet"
+        self.PROJECT_DATASET_DIR = os.path.join(self.DATASET_DIR, project_name)
+        self.CSV_DATASET_DIR = os.path.join(self.PROJECT_DATASET_DIR, "csv")
+        self.PARQUET_DATASET_DIR = os.path.join(self.PROJECT_DATASET_DIR, "parquet")
         self.TABLES = [file.split(".")[0] for file in os.listdir(self.CSV_DATASET_DIR) if file.endswith(".csv")]
         self.logger = logging.getLogger(__name__)
 
 
     def exclude_corrupt_columns(self, filename: str, columns: list[str]):
         # Excluding corrupted columns in the dataset
-        filepath = f"{self.CSV_DATASET_DIR}/{filename}.csv"
+        filename = f"{filename}.csv"
+        filepath = os.path.join(self.CSV_DATASET_DIR, filename)
         df = pd.read_csv(filepath)
 
         if set(columns).issubset(df.columns):
             df = df.drop(columns=columns, axis=1)
-            self.logger.info(f"Removed corrupted {columns} from {filename}.csv")
+            self.logger.info(f"Removed corrupted {columns} from {filename}")
             df.to_csv(filepath, index=False)
-            self.logger.info(f"Saved {filename}.csv")
+            self.logger.info(f"Saved {filename}")
         else:
             self.logger.info("No corrupt column exists")
 
