@@ -1,5 +1,4 @@
 import os
-import logging
 from datetime import datetime
 from include.extractor import DatasetDownloader
 from include.transformer import DataTransformer
@@ -28,7 +27,6 @@ with DAG(
     max_active_runs=1,
     max_active_tasks=3
 ):
-    THIS_DAG_ID = "load_test"
     PROJECT_NAME = "transfermarkt"
     GCS_BUCKET_NAME = os.getenv("BUCKET_NAME")
     GCP_CONN_ID = os.getenv("GCP_CONN_ID")
@@ -48,6 +46,11 @@ with DAG(
         op_args=[dataset_name]
     )
 
+    bash_move_seed_command = f"mv {DATASET_DIR}/csv/competitions.csv {os.getenv('DBT_PROJECT_DIR')}/seeds"
+    move_seed_files = BashOperator(
+        task_id="move_seed_files",
+        bash_command=bash_move_seed_command
+    )
 
     """
     [Pre-transformation]
@@ -173,5 +176,5 @@ with DAG(
 
     end = EmptyOperator(task_id="end")
 
-    start >> extract_raw_data >> pre_process_data >> load_raw_data 
+    start >> extract_raw_data >> move_seed_files >> pre_process_data >> load_raw_data 
     load_raw_data >> dbt_run_models >> clean_local_dataset >> end
