@@ -14,19 +14,6 @@ models:
           - dbt_utils.accepted_range:
               min_value: 0
 
-  - name: dim_competitions
-    config:
-      materialized: table
-    columns:
-      - name: competition_id
-        tests:
-          - unique
-          - not_null
-  
-  - name: dim_countries
-    config:
-      materialized: table
-
   - name: dim_players
     config:
       materialized: table
@@ -76,7 +63,18 @@ models:
       materialized: incremental
       unique_key: game_event_id
       cluster_by: [game_id, clock]
-      
+    columns:
+      - name: clock
+        data_type: int64
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 150
+              config:
+                severity: error
+                error_if: ">200"
+                warn_if: ">150"
+
   - name: dim_player_valuations
     columns:
       - name: market_value_in_eur
@@ -121,6 +119,10 @@ models:
           - dbt_utils.accepted_range:
               min_value: 0
               max_value: 150
+              config:
+                severity: error
+                error_if: ">200"
+                warn_if: ">150"
 
 
 

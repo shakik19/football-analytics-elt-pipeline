@@ -1,0 +1,5 @@
+version: 2
+
+seeds:
+  - name: dim_country_codes
+  - name: dim_competitions
