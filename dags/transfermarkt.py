@@ -1,5 +1,8 @@
 import os
+import logging
 from datetime import datetime
+from include.extractor import DatasetDownloader
+from include.transformer import DataTransformer
 from airflow import DAG
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
@@ -7,8 +10,6 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
-from include.extractor import DatasetDownloader
-from include.transformer import DataTransformer
 from cosmos import (DbtTaskGroup,
                     ProjectConfig,
                     ProfileConfig,
@@ -25,11 +26,14 @@ with DAG(
     tags=["ELT", "gcp", "bigquery", "cloud_storage","dbt"],
     catchup=False,
     max_active_runs=1,
-    max_active_tasks=5
+    max_active_tasks=3
 ):
+    THIS_DAG_ID = "load_test"
     PROJECT_NAME = "transfermarkt"
+    GCS_BUCKET_NAME = os.getenv("BUCKET_NAME")
     GCP_CONN_ID = os.getenv("GCP_CONN_ID")
     DATASET_DIR = os.getenv("DATASET_DIR")
+    
     start = EmptyOperator(task_id="start")
 
     """
@@ -50,64 +54,64 @@ with DAG(
     Excluding some corrupt columns from the game_lineups.csv file
     The schema is inconsistent in the "number" and "team_captain columns
     """
-    pt_columns = ["number", "team_captain"]
-    pt_filename = "game_lineups"
     t_transformer = DataTransformer(project_name=PROJECT_NAME)
-    pre_process_data = PythonOperator(
-        task_id="pre_process_data",
-        python_callable=t_transformer.exclude_corrupt_columns,
-        op_args=[pt_filename, pt_columns]
-    )
+    with TaskGroup(group_id="pre_process_data") as pre_process_data:
+        pt_columns = ["number", "team_captain"]
+        pt_filename = "game_lineups"
+        exclude_columns_task = PythonOperator(
+            task_id="exclude_columns_task",
+            python_callable=t_transformer.exclude_corrupt_columns,
+            op_args=[pt_filename, pt_columns]
+        )
 
-    """
-    Converting csv files to parquet for compression and auto schema generation
-    """
-    convert_to_parquet = PythonOperator(
-        task_id="convert_to_parquet",
-        python_callable=t_transformer.csv_to_parquet
-    )
+        """
+        Converting csv files to parquet for compression and auto schema generation
+        """
+        convert_to_parquet = PythonOperator(
+            task_id="convert_to_parquet",
+            python_callable=t_transformer.csv_to_parquet
+        )
+
+        exclude_columns_task >> convert_to_parquet
 
 
     """ 
     [Load]
-    Uploading parquet files to Data Lake(Google Cloud Stroage) 
-    """
+    Upload files to GCS and load them into BQ
+    """ 
     TABLES = t_transformer.TABLES
-    with TaskGroup(group_id="upload_files_to_gcs", 
-                   tooltip="Upload files to GCS") as upload_files_to_gcs:
+    with TaskGroup(group_id="load_raw_data") as load_raw_data:
         for table in TABLES:
             filename = f"{table}.parquet"
             src_file_path = os.path.join(t_transformer.PARQUET_DATASET_DIR, filename)
-            dst_file_path = os.path.join(PROJECT_NAME, filename)
-            task_id = f"upload_{table}"
-            LocalFilesystemToGCSOperator(
-                task_id=task_id,
+            gcs_file_path = os.path.join(PROJECT_NAME, filename)
+            table_name = f"{os.getenv('PROJECT_ID')}.{os.getenv('SEED_DATASET_NAME')}.{table}"
+            gcs_file_uri_prefix = os.path.join(GCS_BUCKET_NAME, gcs_file_path)
+            
+            """ 
+            Uploading parquet files to Data Lake(Google Cloud Stroage) 
+            """
+            upload_to_gcs = LocalFilesystemToGCSOperator(
+                task_id=f"upload_{table}",
                 src=src_file_path,
-                dst=dst_file_path,
-                bucket=os.getenv("BUCKET_NAME"),
+                dst=gcs_file_path,
+                bucket=GCS_BUCKET_NAME,
                 gcp_conn_id=GCP_CONN_ID
             )
-
-    """
-    Loading data from Data Lake to Data Warehouse as native tables for 
-    transformation and analysis
-    """
-    with TaskGroup(group_id="load_files_into_bigquery", 
-                   tooltip="Load files into BigQuery") as load_files_into_bigquery:
-        for table in TABLES:
-            filename = f"{table}.parquet"
-            filepath = os.path.join(PROJECT_NAME, filename)
-            table_name = f"{os.getenv('PROJECT_ID')}.{os.getenv('SEED_DATASET_NAME')}.{table}"
-            gcs_filepath = os.path.join(os.getenv("BUCKET_NAME"), filepath)
+            
             query = f"""
                 LOAD DATA OVERWRITE `{table_name}`
                 FROM FILES (
                 format = 'PARQUET',
-                uris = ['gs://{gcs_filepath}']
+                uris = ['gs://{gcs_file_uri_prefix}']
                 );
             """
 
-            load_table = BigQueryInsertJobOperator(
+            """
+            Loading data from Data Lake to Data Warehouse as native tables for 
+            transformation and analysis
+            """
+            load_dataset_table = BigQueryInsertJobOperator(
                 task_id=f'load_{table}_into_bigquery',
                 gcp_conn_id=GCP_CONN_ID,
                 configuration={
@@ -117,9 +121,10 @@ with DAG(
                     }
                 },
                 location=os.getenv("DATASET_LOCATION"),
-                result_timeout=30
+                result_timeout=60
             )
 
+            upload_to_gcs >> load_dataset_table
 
     """
     [Transform]
@@ -168,7 +173,5 @@ with DAG(
 
     end = EmptyOperator(task_id="end")
 
-
-    start >> extract_raw_data >> pre_process_data >> convert_to_parquet
-    convert_to_parquet >> upload_files_to_gcs >> load_files_into_bigquery
-    load_files_into_bigquery >> dbt_run_models >> clean_local_dataset >> end
+    start >> extract_raw_data >> pre_process_data >> load_raw_data 
+    load_raw_data >> dbt_run_models >> clean_local_dataset >> end
