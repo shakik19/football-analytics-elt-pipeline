@@ -29,3 +29,11 @@ class DatasetDownloader:
 
         for directory in directories:
             os.makedirs(directory, exist_ok=True)
+
+        # moving seed files
+        source_path = os.path.join(self.DATASET_DIR, self.PROJECT_NAME, "csv", "competitions.csv")
+        dst_path = os.path.join(os.getenv("DBT_PROJECT_DIR"), "seeds", "dim_competitions.csv")
+        try:
+            shutil.move(source_path, dst_path)
+        except OSError as e:
+            logging.error(f"Error moving file: {e}")
