@@ -10,7 +10,7 @@ airflow:
           conn_uri: ""
           conn_extra:
             example_extra_field: example-value
-        - conn_id: gcp
+        - conn_id: google_cloud_default
           conn_type: google_cloud_platform
           conn_host: ""
           conn_schema: ""
@@ -26,7 +26,7 @@ airflow:
           pool_slot: 0
           pool_description: ""
         - pool_name: default_pool
-          pool_slot: 128
+          pool_slot: 32
           pool_description: Default pool
     variables:
         - variable_name: ""
