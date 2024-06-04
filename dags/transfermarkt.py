@@ -46,11 +46,6 @@ with DAG(
         op_args=[dataset_name]
     )
 
-    bash_move_seed_command = f"mv {DATASET_DIR}/csv/competitions.csv {os.getenv('DBT_PROJECT_DIR')}/seeds"
-    move_seed_files = BashOperator(
-        task_id="move_seed_files",
-        bash_command=bash_move_seed_command
-    )
 
     """
     [Pre-transformation]
@@ -129,6 +124,17 @@ with DAG(
 
             upload_to_gcs >> load_dataset_table
 
+
+    """
+    Clearing redundant files
+    """    
+    bash_remove_command = f"rm -rfv {t_transformer.PROJECT_DATASET_DIR}"
+    clean_local_dataset = BashOperator(
+        task_id = "clean_local_dataset",
+        bash_command=bash_remove_command
+    )
+
+
     """
     [Transform]
     DBT transformation tasks
@@ -166,15 +172,8 @@ with DAG(
 
     """
     END
-    Before ending clering the local csv and parquet files
     """
-    bash_remove_command = f"rm -rfv {t_transformer.PROJECT_DATASET_DIR}"
-    clean_local_dataset = BashOperator(
-        task_id = "clean_local_dataset",
-        bash_command=bash_remove_command
-    )
-
     end = EmptyOperator(task_id="end")
 
-    start >> extract_raw_data >> move_seed_files >> pre_process_data >> load_raw_data 
-    load_raw_data >> dbt_run_models >> clean_local_dataset >> end
+    start >> extract_raw_data >> pre_process_data >> load_raw_data 
+    load_raw_data >> clean_local_dataset >> dbt_run_models >> end
