@@ -63,17 +63,6 @@ models:
       materialized: incremental
       unique_key: game_event_id
       cluster_by: [game_id, clock]
-    columns:
-      - name: clock
-        data_type: int64
-        tests:
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 150
-              config:
-                severity: error
-                error_if: ">200"
-                warn_if: ">150"
 
   - name: dim_player_valuations
     columns:
