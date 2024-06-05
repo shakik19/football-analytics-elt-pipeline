@@ -1,6 +1,7 @@
 .*
 *.parquet
 *.csv
+dbt.sh
 __pycache__
 main/vars_local.py
 *.log
