@@ -4,6 +4,8 @@ models:
   - name: dim_clubs
     config:
       materialized: table
+      unique_key: club_id
+      cluster_by: [domestic_competition_id]
     columns:
       - name: club_id
         tests:
