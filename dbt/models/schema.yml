@@ -2,13 +2,11 @@ version: 2
 
 sources:
   - name: raw
-    schema: transfermarkt_seed
-
+    schema: "{{ env_var('SEED_DATASET_NAME') }}"
     tables:
       - name: appearances
       - name: club_games
       - name: clubs
-      - name: competitions
       - name: game_events
       - name: game_lineups
       - name: games

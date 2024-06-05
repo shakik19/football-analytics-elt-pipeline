@@ -6,12 +6,10 @@ WITH cte_game_lineups AS(
         player_id,
         club_id,
         player_name,
-        type,
-        position AS playing_position,
-        number,
-        team_captain
+        src.type,
+        src.position AS playing_position,
     FROM
-        {{ source("raw", "game_lineups") }}
+        {{ source("raw", "game_lineups") }} src
 )
 
 SELECT

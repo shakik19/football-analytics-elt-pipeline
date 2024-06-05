@@ -3,7 +3,7 @@ WITH cte_games AS(
         game_id,
         competition_id,
         season,
-        round AS match_day,
+        src.round AS match_day,
         {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} as game_date,
         home_club_id,
         away_club_id,
@@ -20,10 +20,10 @@ WITH cte_games AS(
         away_club_formation,
         home_club_name,
         away_club_name,
-        aggregate,
+        src.aggregate AS agg_score,
         competition_type
     FROM
-        {{ source("raw", "games") }}
+        {{ source("raw", "games") }} src
 )
 
 SELECT

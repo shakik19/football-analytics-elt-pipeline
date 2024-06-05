@@ -1,11 +1,12 @@
-variable "credentials" {
+variable "service_account" {
   description = "Your project's gcp credentials file path(absolute path recommended)"
-  default = "../credentials/gcp_key.json"
+  type = string
+  sensitive = true
 }
 
-variable "project" {
+variable "project_id" {
   description = "Project id"
-  default = "fast-forward-412713"
+  type = string
 }
 
 variable "region" {
@@ -13,38 +14,33 @@ variable "region" {
   Region that will be used to create cloud storage bucket and bigquery dataset
   e.g. us-west1
   EOT
-
-  default = "us-west1"
+  type = string
 }
 
-variable "location" {
-  description = "Project location"
-  default = "US"
-}
 
-variable "bq_seed_dataset_id" {
+variable "seed_dataset_id" {
   description = <<EOT
   A unique dataset id. Please check the official documentation for details
   naming convention
   EOT
 
-  default = "transfermarkt_seed"
+  type = string
 }
 
-variable "bq_core_dataset_id" {
+variable "core_dataset_id" {
   description = <<EOT
   A unique dataset id. Please check the official documentation for details
   naming convention
   EOT
 
-  default = "transfermarkt_core"
+  type = string
 }
 
-variable "gcs_bucket_name" {
+variable "bucket_name" {
   description = <<EOT
   A globally unique bucket name. Please check the official documentation for
   detail naming convention
   EOT
 
-  default = "transfermarkt-data"
+  type = string
 }

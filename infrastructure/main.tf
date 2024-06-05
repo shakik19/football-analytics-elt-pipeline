@@ -8,13 +8,13 @@ terraform {
 }
 
 provider "google" {
-  project     = var.project
-  credentials = file(var.credentials)
+  project     = var.project_id
+  credentials = file(var.service_account)
   region      = var.region
 }
 
 resource "google_storage_bucket" "gcs_bucket" {
-  name     = var.gcs_bucket_name
+  name     = var.bucket_name
   location = var.region
 
   public_access_prevention = "enforced"
@@ -31,13 +31,13 @@ resource "google_storage_bucket" "gcs_bucket" {
 }
 
 resource "google_bigquery_dataset" "dataset_seed" {
-  dataset_id                 = var.bq_seed_dataset_id
+  dataset_id                 = var.seed_dataset_id
   location                   = var.region
   delete_contents_on_destroy = true
 }
 
 resource "google_bigquery_dataset" "dataset_core" {
-  dataset_id                 = var.bq_core_dataset_id
+  dataset_id                 = var.core_dataset_id
   location                   = var.region
   delete_contents_on_destroy = true
 }
