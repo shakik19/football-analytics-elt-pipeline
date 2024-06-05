@@ -16,6 +16,8 @@ WITH cte_games AS(
         END AS season_half,
         home_club_id,
         away_club_id,
+        home_club_name,
+        away_club_name,
         home_club_goals,
         away_club_goals,
         home_club_position,
@@ -27,12 +29,13 @@ WITH cte_games AS(
         referee,
         home_club_formation,
         away_club_formation,
-        home_club_name,
-        away_club_name,
         src.aggregate AS agg_score,
         competition_type
     FROM
         {{ source("raw", "games") }} src
+    WHERE
+        home_club_name IS NOT NULL
+        AND away_club_name IS NOT NULL
 )
 
 SELECT
