@@ -29,25 +29,12 @@ models:
         tests:
           - dbt_utils.accepted_range:
               min_value: 0
-  
-  - name: fact_games
+
+  - name: dim_game_info
     config:
       materialized: incremental
       unique_key: game_id
-      cluster_by: [season, competition_id]
-    columns:
-      - name: game_id
-        tests:
-          - unique
-          - not_null
-      - name: home_club_goals
-        tests:
-          - dbt_utils.accepted_range:
-              min_value: 0
-      - name: away_club_goals
-        tests:
-          - dbt_utils.accepted_range:
-              min_value: 0
+      cluster_by: [competition_id, season]
 
   - name: fact_game_lineups
     config:
@@ -56,9 +43,13 @@ models:
       cluster_by: [game_id]
 
   - name: fact_club_games
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "own_id != opponent_id"
     config:
-      materialized: table
-      cluster_by: club_id
+      materialized: incremental
+      unique_key: game_id
+      cluster_by: [game_date, own_id]
   
   - name: fact_game_events
     config:
@@ -136,3 +127,22 @@ models:
   #       - field: ingestion_time
   #       - data_type: date
   #       - granularity: year
+
+  # - name: fact_games
+  #   config:
+  #     materialized: incremental
+  #     unique_key: game_id
+  #     cluster_by: [season, competition_id]
+  #   columns:
+  #     - name: game_id
+  #       tests:
+  #         - unique
+  #         - not_null
+  #     - name: home_club_goals
+  #       tests:
+  #         - dbt_utils.accepted_range:
+  #             min_value: 0
+  #     - name: away_club_goals
+  #       tests:
+  #         - dbt_utils.accepted_range:
+  #             min_value: 0
