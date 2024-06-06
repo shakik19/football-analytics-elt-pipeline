@@ -6,10 +6,7 @@ WITH cte_temp AS(
         date AS game_date,
         EXTRACT(MONTH FROM date) AS game_month,
         EXTRACT(YEAR FROM date) AS game_year,
-        CASE 
-            WHEN EXTRACT(MONTH FROM date) BETWEEN 6 AND 12 THEN CONCAT(season, "/", season + 1)
-            ELSE CONCAT(season - 1, "/", season)
-        END AS season,
+        season,
         CASE 
             WHEN EXTRACT(MONTH FROM date) BETWEEN 6 AND 12 THEN 'first'
             ELSE 'second'
