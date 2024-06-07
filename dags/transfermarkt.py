@@ -9,20 +9,16 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
-from cosmos import (DbtTaskGroup,
-                    ProjectConfig,
-                    ProfileConfig,
-                    ExecutionConfig,
-                    RenderConfig)
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig
 from cosmos.constants import TestBehavior
 
-
+# Define the DAG
 with DAG(
     dag_id="transfermarkt",
     description="Transfermarkt ELT data pipeline",
     start_date=datetime(2024, 1, 1),
     schedule_interval=None,
-    tags=["ELT", "gcp", "bigquery", "cloud_storage","dbt"],
+    tags=["ELT", "gcp", "bigquery", "cloud_storage", "dbt"],
     catchup=False,
     max_active_runs=1,
     max_active_tasks=3
@@ -31,12 +27,12 @@ with DAG(
     GCS_BUCKET_NAME = os.getenv("BUCKET_NAME")
     GCP_CONN_ID = os.getenv("GCP_CONN_ID")
     DATASET_DIR = os.getenv("DATASET_DIR")
-    
+
     start = EmptyOperator(task_id="start")
 
     """
     [Extraction] 
-    Get data from kaggle api in csv format 
+    Task to download data from Kaggle API in CSV format.
     """
     dataset_name = "davidcariboo/player-scores"
     t_extractor = DatasetDownloader(project_name=PROJECT_NAME)
@@ -46,11 +42,11 @@ with DAG(
         op_args=[dataset_name]
     )
 
-
     """
     [Pre-transformation]
-    Excluding some corrupt columns from the game_lineups.csv file
-    The schema is inconsistent in the "number" and "team_captain columns
+    Task group for preprocessing data.
+    1. Excludes corrupt columns from game_lineups.csv file.
+    2. Converts CSV files to Parquet format.
     """
     t_transformer = DataTransformer(project_name=PROJECT_NAME)
     with TaskGroup(group_id="pre_process_data") as pre_process_data:
@@ -62,9 +58,6 @@ with DAG(
             op_args=[pt_filename, pt_columns]
         )
 
-        """
-        Converting csv files to parquet for compression and auto schema generation
-        """
         convert_to_parquet = PythonOperator(
             task_id="convert_to_parquet",
             python_callable=t_transformer.csv_to_parquet
@@ -72,11 +65,10 @@ with DAG(
 
         exclude_columns_task >> convert_to_parquet
 
-
     """ 
     [Load]
-    Upload files to GCS and load them into BQ
-    """ 
+    Task group to upload files to Google Cloud Storage (GCS) and load them into BigQuery (BQ).
+    """
     TABLES = t_transformer.TABLES
     with TaskGroup(group_id="load_raw_data") as load_raw_data:
         for table in TABLES:
@@ -87,7 +79,7 @@ with DAG(
             gcs_file_uri_prefix = os.path.join(GCS_BUCKET_NAME, gcs_file_path)
             
             """ 
-            Uploading parquet files to Data Lake(Google Cloud Stroage) 
+            Task to upload Parquet files to Google Cloud Storage.
             """
             upload_to_gcs = LocalFilesystemToGCSOperator(
                 task_id=f"upload_{table}",
@@ -106,8 +98,7 @@ with DAG(
             """
 
             """
-            Loading data from Data Lake to Data Warehouse as native tables for 
-            transformation and analysis
+            Task to load data from GCS into BigQuery as native tables for transformation and analysis.
             """
             load_dataset_table = BigQueryInsertJobOperator(
                 task_id=f'load_{table}_into_bigquery',
@@ -124,20 +115,18 @@ with DAG(
 
             upload_to_gcs >> load_dataset_table
 
-
     """
-    Clearing redundant files
+    Task to clear redundant local files after loading to BigQuery.
     """    
     bash_remove_command = f"rm -rfv {t_transformer.PROJECT_DATASET_DIR}"
     clean_local_dataset = BashOperator(
-        task_id = "clean_local_dataset",
+        task_id="clean_local_dataset",
         bash_command=bash_remove_command
     )
 
-
     """
     [Transform]
-    DBT transformation tasks
+    Task group for DBT transformation tasks.
     """
     DBT_PROJECT_DIR = os.getenv("DBT_PROJECT_DIR")
     DBT_EXE_PATH = os.getenv("DBT_EXE_PATH")
@@ -175,5 +164,6 @@ with DAG(
     """
     end = EmptyOperator(task_id="end")
 
+    # Define task dependencies
     start >> extract_raw_data >> pre_process_data >> load_raw_data 
     load_raw_data >> clean_local_dataset >> dbt_run_models >> end
