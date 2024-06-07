@@ -1,14 +1,20 @@
+-- This SQL script defines a dbt model that calculates various player attributes and their market values.
+-- It aggregates player valuation data to obtain the current and highest market values for each player.
+
 WITH
-last_updates AS(
+last_updates AS (
+    -- CTE to get the last update time for each player
     SELECT
         player_id,
         MAX({{ dbt.safe_cast("date", api.Column.translate_type("date")) }}) AS last_updated_at
     FROM
         {{ source("raw", "player_valuations") }}
     GROUP BY
-      1   
+        1
 ),
-values_of_each AS(
+
+values_of_each AS (
+    -- CTE to get the market values of each player for each date
     SELECT
         player_id,
         {{ dbt.safe_cast("date", api.Column.translate_type("date")) }} AS date,
@@ -16,7 +22,9 @@ values_of_each AS(
     FROM
         {{ source("raw", "player_valuations") }}
 ),
-current_values AS(
+
+current_values AS (
+    -- CTE to get the current market value for each player
     SELECT
         lup.player_id,
         ve.market_value_in_eur
@@ -28,7 +36,9 @@ current_values AS(
     WHERE
         lup.player_id = ve.player_id
 ),
-max_values AS(
+
+max_values AS (
+    -- CTE to get the highest market value for each player
     SELECT
         player_id,
         MAX(market_value_in_eur) AS market_value_in_eur
@@ -37,7 +47,9 @@ max_values AS(
     GROUP BY
         1
 ),
-players AS(
+
+players AS (
+    -- CTE to get player attributes
     SELECT
         player_id,
         first_name,
@@ -60,6 +72,8 @@ players AS(
     FROM 
         {{ source("raw", "players") }}
 )
+
+-- Final SELECT statement to combine player attributes and market values
 SELECT
     players.player_id,
     players.first_name,
