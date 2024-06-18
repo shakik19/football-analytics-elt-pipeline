@@ -74,7 +74,7 @@ SELECT
   clubs.national_team_players,
   clubs.stadium_name,
   clubs.stadium_seats,
-  clubs.net_transfer_record,
+  REPLACE(REPLACE(clubs.net_transfer_record, "€", ""), "m", "") AS net_transfer_record,
   clubs.last_season
 FROM
   clubs
