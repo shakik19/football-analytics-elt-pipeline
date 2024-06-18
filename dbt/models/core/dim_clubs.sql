@@ -74,7 +74,11 @@ SELECT
   clubs.national_team_players,
   clubs.stadium_name,
   clubs.stadium_seats,
-  REPLACE(REPLACE(clubs.net_transfer_record, "€", ""), "m", "") AS net_transfer_record,
+  CAST(
+    TRIM(
+      REGEXP_REPLACE(clubs.net_transfer_record, r'[€+mk]', '')
+    ) AS FLOAT64
+  ) AS net_transfer_record,
   clubs.last_season
 FROM
   clubs

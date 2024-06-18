@@ -2,6 +2,7 @@ SELECT
   dgi.season,
   dc.name AS club_name,
   fa.player_name,
+  dp.current_market_value_in_eur,
   COUNT(*) AS matches_played,
   SUM(fa.minutes_played) AS total_minutes_played,
   ROUND(AVG(fa.minutes_played), 2) AS avg_minutes_played,
@@ -22,9 +23,11 @@ LEFT JOIN
   `transfermarkt_core.dim_game_info` dgi USING(game_id)
 LEFT JOIN 
   `transfermarkt_core.dim_clubs` dc ON dc.club_id = fa.player_club_id
+LEFT JOIN `transfermarkt_core.dim_players` dp USING(player_id)
 GROUP BY
   dgi.season,
   dc.name,
-  fa.player_name
+  fa.player_name,
+  dp.current_market_value_in_eur
 ORDER BY
   dgi.season DESC
