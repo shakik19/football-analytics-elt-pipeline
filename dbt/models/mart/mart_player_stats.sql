@@ -22,8 +22,6 @@ LEFT JOIN
   `transfermarkt_core.dim_game_info` dgi USING(game_id)
 LEFT JOIN 
   `transfermarkt_core.dim_clubs` dc ON dc.club_id = fa.player_club_id
-WHERE 
-  fa.player_club_id = 418
 GROUP BY
   dgi.season,
   dc.name,
