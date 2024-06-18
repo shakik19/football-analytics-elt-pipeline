@@ -19,7 +19,8 @@ SELECT
   CASE
     WHEN dgi.round = "Final" AND fcg.is_win = 1 THEN "Champion"
     WHEN dgi.round = "Final" AND fcg.is_win = -1 THEN "Runner-Up"
-    WHEN dgi.competition_type = "domestic_league" AND fcg.own_position = 1 THEN "Champion" 
+    WHEN dgi.competition_type = "domestic_league" AND fcg.own_position = 1 THEN "Champion"
+    WHEN dgi.competition_type = "domestic_league" THEN fcg.own_position
     ELSE dgi.round
   END AS last_standing
 FROM
