@@ -20,8 +20,8 @@ with DAG(
     schedule_interval=None,
     tags=["ELT", "gcp", "bigquery", "cloud_storage", "dbt"],
     catchup=False,
-    max_active_runs=1,
-    max_active_tasks=3
+    max_active_runs=os.getenv("TM_DAG_MAX_ACTIVE_RUNS"),
+    max_active_tasks=os.getenv("TM_DAG_MAX_ACTIVE_TASKS")
 ):
     PROJECT_NAME = "transfermarkt"
     GCS_BUCKET_NAME = os.getenv("BUCKET_NAME")
@@ -109,7 +109,7 @@ with DAG(
                         "useLegacySql": False,
                     }
                 },
-                location=os.getenv("DATASET_LOCATION"),
+                location=os.getenv("REGION"),
                 result_timeout=60
             )
 
@@ -136,7 +136,7 @@ with DAG(
     )
 
     PROFILE_CONFIG = ProfileConfig(
-        profile_name=os.getenv("DBT_PROFILES_NAME"),
+        profile_name="default",
         target_name=os.getenv("DBT_PROFILES_TARGET"),
         profiles_yml_filepath=f"{DBT_PROJECT_DIR}/profiles.yml"
     )
