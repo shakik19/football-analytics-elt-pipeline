@@ -17,8 +17,8 @@ SELECT
   AVG(CASE WHEN fcg.game_location = "home" THEN dgi.attendance END) AS avg_home_attendance,
   AVG(CASE WHEN fcg.game_location = "away" THEN dgi.attendance END) AS avg_away_attendance
 FROM
-  `transfermarkt_core.fact_club_games` fcg
-  LEFT JOIN `transfermarkt_core.dim_game_info` dgi USING(game_id)
-  LEFT JOIN `transfermarkt_core.dim_clubs` dc ON dc.club_id = fcg.own_id
+  {{ ref("fact_club_games") }} fcg
+  LEFT JOIN {{ ref("dim_game_info") }} dgi USING(game_id)
+  LEFT JOIN {{ ref("dim_clubs") }} dc ON dc.club_id = fcg.own_id
 GROUP BY
   1, 2, 3, 4

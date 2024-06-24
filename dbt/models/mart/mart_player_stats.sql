@@ -18,12 +18,12 @@ SELECT
   SUM(fa.yellow_cards) AS yellow_cards,
   SUM(fa.red_cards) AS red_cards
 FROM
-  `transfermarkt_core.fact_appearances` fa
+  {{ ref("fact_appearances") }} fa
 LEFT JOIN 
-  `transfermarkt_core.dim_game_info` dgi USING(game_id)
+  {{ ref("dim_game_info") }} dgi USING(game_id)
 LEFT JOIN 
-  `transfermarkt_core.dim_clubs` dc ON dc.club_id = fa.player_club_id
-LEFT JOIN `transfermarkt_core.dim_players` dp USING(player_id)
+  {{ ref("dim_clubs") }} dc ON dc.club_id = fa.player_club_id
+LEFT JOIN {{ ref("dim_players") }} dp USING(player_id)
 GROUP BY
   dgi.season,
   dc.name,

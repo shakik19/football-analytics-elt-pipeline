@@ -6,7 +6,7 @@ SELECT
   SUM(current_market_value_in_eur) AS value_in_euro,
   ROUND(AVG(age), 2) AS avg_age
 FROM
-  `transfermarkt_core.dim_players`
+  {{ ref("dim_players") }}
 WHERE
   current_club_name IS NOT NULL
 GROUP BY

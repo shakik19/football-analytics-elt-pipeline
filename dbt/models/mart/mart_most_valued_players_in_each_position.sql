@@ -5,10 +5,9 @@ WITH cte_add_rn AS (
     dp.position,
     name AS player_name,
     current_market_value_in_eur,
-    row_number() OVER(PARTITION BY position ORDER BY current_market_value_in_eur DESC) AS rn
+    row_number() OVER(PARTITION BY position, current_club_id ORDER BY current_market_value_in_eur DESC) AS rn
   FROM
-    `transfermarkt_core.dim_players` dp
-  WHERE current_club_id = 418
+    {{ ref("dim_players") }} dp
 )
 SELECT
   club_id,
