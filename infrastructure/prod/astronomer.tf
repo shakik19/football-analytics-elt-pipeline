@@ -6,7 +6,7 @@ provider "astro" {
 resource "astro_deployment" "standard" {
   workspace_id                   = var.ASTRO_WORKSPACE_ID
   original_astro_runtime_version = "11.5.0"
-  name                           = var.DEPLOYMENT_NAME
+  name                           = "transfermarkt-${var.ENV_NAME}"
   description                    = "A deployment for the transfermarkt data pipeline"
   type                           = "STANDARD"
   cloud_provider                 = "GCP"
@@ -61,22 +61,22 @@ resource "astro_deployment" "standard" {
     },
     {
       key       = "SEED_DATASET_NAME",
-      value     = "transfermarkt_seed"
+      value     = "${var.ENV_NAME}_transfermarkt_seed"
       is_secret = false
     },
     {
       key       = "CORE_DATASET_NAME",
-      value     = "transfermarkt_core"
+      value     = "${var.ENV_NAME}_transfermarkt_core"
       is_secret = false
     },
     {
       key       = "BUCKET_NAME"
-      value     = "transfermarkt-data"
+      value     = "${var.ENV_NAME}-transfermarkt-data"
       is_secret = false
     },
     {
       key       = "DBT_PROFILES_TARGET"
-      value     = "prod"
+      value     = var.ENV_NAME
       is_secret = false
   }]
 }

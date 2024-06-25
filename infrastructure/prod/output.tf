@@ -35,5 +35,5 @@ output "scaling_spec" {
 }
 
 output "deployment_is_hibernating" {
-  value = astro_deployment.standard.scaling_status.hibernation_status.is_hibernating
+  value = astro_deployment.standard.scaling_status.hibernation_status
 }

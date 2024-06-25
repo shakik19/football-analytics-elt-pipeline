@@ -8,12 +8,6 @@ variable "REGION" {
   type = string
 }
 
-variable "DEPLOYMENT_NAME" {
-  description = "The name of the deployment"
-  default = "transfermarkt-prod"
-  type = string
-}
-
 variable "CONTACT_EMAILS" {
   description = "Emails to send alerts and updates"
   default = []
@@ -22,6 +16,11 @@ variable "CONTACT_EMAILS" {
 
 
 #? The variables below are set through Environment Variables. Configuration isn't required
+variable "ENV_NAME" {
+  description = "Environment name"
+  type = string
+}
+
 variable "GCP_JSON_KEY_FILEPATH" {
   description = "Your project's gcp credentials file path(absolute path recommended)"
   type = string
