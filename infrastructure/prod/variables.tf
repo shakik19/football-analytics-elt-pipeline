@@ -1,3 +1,36 @@
+#? Comment out the variables below if you're manually setting these using Astro cloud UI
+#? and also you need to exclude fields that are using these variables at 
+#? ./astronomer.tf:astro_deployment.standard.environment_variables
+variable "GCP_SA_PRIVATE_KEY_ID" {
+  type = string
+  sensitive = true
+}
+
+variable "GCP_SA_PRIVATE_KEY" {
+  type = string
+  sensitive = true
+}
+
+variable "GCP_SA_CLIENT_EMAIL" {
+  type = string
+  sensitive = true
+}
+
+variable "GCP_SA_CLIENT_ID" {
+  type = string
+  sensitive = true
+}
+
+variable "KAGGLE_USERNAME" {
+  type = string
+  sensitive = true
+}
+
+variable "KAGGLE_KEY" {
+  type = string
+  sensitive = true
+}
+
 #? OPTIONAL configurable variables
 variable "REGION" {
   description = <<EOT
@@ -22,7 +55,7 @@ variable "ENV_NAME" {
 }
 
 variable "GCP_JSON_KEY_FILEPATH" {
-  description = "Your project's gcp credentials file path(absolute path recommended)"
+  description = "Only used for setting for resource creation by TF. Your project's gcp credentials file path(absolute path recommended)"
   type = string
   sensitive = true
 }

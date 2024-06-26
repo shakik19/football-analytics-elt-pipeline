@@ -33,7 +33,3 @@ output "resource_quota_memory" {
 output "scaling_spec" {
   value = astro_deployment.standard.scaling_spec
 }
-
-output "deployment_is_hibernating" {
-  value = astro_deployment.standard.scaling_status.hibernation_status
-}

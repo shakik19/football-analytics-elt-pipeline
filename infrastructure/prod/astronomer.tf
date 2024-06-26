@@ -35,20 +35,37 @@ resource "astro_deployment" "standard" {
     {
       name               = "default"
       is_default         = true
-      astro_machine      = "A5"
-      max_worker_count   = 2
-      min_worker_count   = 0
-      worker_concurrency = 1
-    },
-    {
-      name               = "heavy-tasks"
-      is_default         = false
       astro_machine      = "A20"
       max_worker_count   = 1
-      min_worker_count   = 0
+      min_worker_count   = 1
       worker_concurrency = 8
   }]
   environment_variables = [
+    {
+      key       = "GCP_SA_PRIVATE_KEY_ID"
+      value     = var.GCP_SA_PRIVATE_KEY_ID
+      is_secret = true
+    },
+    {
+      key   = "GCP_SA_PRIVATE_KEY"
+      value = var.GCP_SA_PRIVATE_KEY
+      is_secret = true
+    },
+    {
+      key   = "GCP_SA_CLIENT_EMAIL"
+      value = var.GCP_SA_CLIENT_EMAIL
+      is_secret = true
+    },
+    {
+      key   = "GCP_SA_CLIENT_ID"
+      value = var.GCP_SA_CLIENT_ID
+      is_secret = true
+    },
+    {
+      key   = "ENV_NAME"
+      value = var.ENV_NAME
+      is_secret = false
+    },
     {
       key       = "PROJECT_ID"
       value     = var.PROJECT_ID
@@ -72,11 +89,6 @@ resource "astro_deployment" "standard" {
     {
       key       = "BUCKET_NAME"
       value     = "${var.ENV_NAME}-transfermarkt-data"
-      is_secret = false
-    },
-    {
-      key       = "DBT_PROFILES_TARGET"
-      value     = var.ENV_NAME
       is_secret = false
   }]
 }
