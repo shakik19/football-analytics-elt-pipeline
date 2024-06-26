@@ -17,4 +17,3 @@ jobs:
       with:
         deployment-id: ${{ secrets.PROD_DEPLOYMENT_ID }}
         root-folder: /home/runner/work/transfermarkt-data-pipeline/transfermarkt-data-pipeline
-        parse: true
