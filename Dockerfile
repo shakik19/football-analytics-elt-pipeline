@@ -3,7 +3,7 @@ FROM quay.io/astronomer/astro-runtime:11.5.0
 WORKDIR $AIRFLOW_HOME
 
 RUN python -m venv dbt_venv && source dbt_venv/bin/activate && \
-    pip install --no-cache-dir astronomer-cosmos==1.4.1 && deactivate
+    pip install --no-cache-dir -r dbt-requirements.txt && deactivate
 
 ENV GCP_CONN_ID="google_cloud_default"
 ENV DATASET_DIR="$AIRFLOW_HOME/dataset"
