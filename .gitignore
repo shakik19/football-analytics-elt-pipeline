@@ -1,4 +1,5 @@
-.*
+.astro
+.terraform*
 *.parquet
 *.csv
 dbt.sh
