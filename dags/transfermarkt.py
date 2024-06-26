@@ -151,21 +151,21 @@ with DAG(
     )
 
     EXECUTION_CONFIG = ExecutionConfig(
-        dbt_executable_path=DBT_EXE_PATH
+        dbt_executable_path=DBT_EXE_PATH,
     )
 
     RENDER_CONFIG = RenderConfig(
         emit_datasets=False,
         test_behavior=TestBehavior.AFTER_EACH,
-        execution_config=EXECUTION_CONFIG
     )
 
     dbt_run_models = DbtTaskGroup(
-        group_id="dbt_run_models",
-        operator_args={"install_deps": True},
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
-        render_config=RENDER_CONFIG
+        execution_config=EXECUTION_CONFIG,
+        render_config=RENDER_CONFIG,
+        group_id="dbt_run_models",
+        operator_args={"install_deps": True}
     )
 
     """

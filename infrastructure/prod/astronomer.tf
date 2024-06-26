@@ -67,8 +67,9 @@ resource "astro_deployment" "standard" {
       is_secret = true
     },
     {
-      key   = "KAGGLE_KEY"
-      value = var.KAGGLE_KEY
+      key       = "KAGGLE_KEY"
+      value     = var.KAGGLE_KEY
+      is_secret = true
     },
     {
       key       = "ENV_NAME"
