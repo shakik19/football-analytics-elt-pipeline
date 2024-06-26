@@ -17,7 +17,7 @@ resource "astro_deployment" "standard" {
   executor                       = "CELERY"
   is_cicd_enforced               = true
   is_dag_deploy_enabled          = true
-  is_development_mode            = true
+  is_development_mode            = false
   is_high_availability           = false
   resource_quota_cpu             = "8"
   resource_quota_memory          = "16Gi"
