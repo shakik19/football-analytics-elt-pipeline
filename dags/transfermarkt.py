@@ -12,16 +12,25 @@ from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobO
 from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig
 from cosmos.constants import TestBehavior
 
-# Define the DAG
+ENV_NAME = os.getenv("ENV_NAME")
+if ENV_NAME == "dev":
+    SCHEDULE_INTERVAL = None
+    TM_DAG_MAX_ACTIVE_RUNS = int(os.getenv("TM_DAG_MAX_ACTIVE_RUNS"))
+    TM_DAG_MAX_ACTIVE_TASKS = int(os.getenv("TM_DAG_MAX_ACTIVE_TASKS"))
+elif ENV_NAME == "prod":
+    SCHEDULE_INTERVAL = "15 6 * * 3"
+    TM_DAG_MAX_ACTIVE_RUNS = 1
+    TM_DAG_MAX_ACTIVE_TASKS= 16
+
 with DAG(
     dag_id="transfermarkt",
     description="Transfermarkt ELT data pipeline",
     start_date=datetime(2024, 1, 1),
-    schedule_interval=None,
-    tags=["ELT", "gcp", "bigquery", "cloud_storage", "dbt"],
+    schedule_interval=SCHEDULE_INTERVAL,
+    tags=["ELT", "gcp", "bigquery", "cloud_storage", "dbt", ENV_NAME],
     catchup=False,
-    max_active_runs=os.getenv("TM_DAG_MAX_ACTIVE_RUNS"),
-    max_active_tasks=os.getenv("TM_DAG_MAX_ACTIVE_TASKS")
+    max_active_runs=TM_DAG_MAX_ACTIVE_RUNS,
+    max_active_tasks=TM_DAG_MAX_ACTIVE_TASKS
 ):
     PROJECT_NAME = "transfermarkt"
     GCS_BUCKET_NAME = os.getenv("BUCKET_NAME")
@@ -137,7 +146,7 @@ with DAG(
 
     PROFILE_CONFIG = ProfileConfig(
         profile_name="default",
-        target_name=os.getenv("DBT_PROFILES_TARGET"),
+        target_name=ENV_NAME,
         profiles_yml_filepath=f"{DBT_PROJECT_DIR}/profiles.yml"
     )
 
@@ -156,7 +165,7 @@ with DAG(
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
-        render_config=None
+        render_config=RENDER_CONFIG
     )
 
     """
