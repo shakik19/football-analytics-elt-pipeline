@@ -16,4 +16,5 @@ jobs:
       uses: astronomer/deploy-action@v0.4
       with:
         deployment-id: ${{ secrets.PROD_DEPLOYMENT_ID }}
+        root-folder: /usr/local/airflow/
         parse: true
