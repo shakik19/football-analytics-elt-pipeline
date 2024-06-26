@@ -20,7 +20,7 @@ if ENV_NAME == "dev":
 elif ENV_NAME == "prod":
     SCHEDULE_INTERVAL = "15 6 * * 3"
     TM_DAG_MAX_ACTIVE_RUNS = 1
-    TM_DAG_MAX_ACTIVE_TASKS= 16
+    TM_DAG_MAX_ACTIVE_TASKS= 9
 
 with DAG(
     dag_id="transfermarkt",
