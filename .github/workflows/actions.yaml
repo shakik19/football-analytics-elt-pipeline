@@ -1,0 +1,19 @@
+name: Transfermarkt prod CI/CD pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  ASTRO_API_TOKEN: ${{ secrets.ASTRO_API_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to Astro
+      uses: astronomer/deploy-action@v0.4
+      with:
+        deployment-id: ${{ secrets.PROD_DEPLOYMENT_ID }}
+        parse: true
