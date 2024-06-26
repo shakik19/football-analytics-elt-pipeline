@@ -157,11 +157,11 @@ with DAG(
     RENDER_CONFIG = RenderConfig(
         emit_datasets=False,
         test_behavior=TestBehavior.AFTER_EACH,
-        dbt_deps=True
     )
 
     dbt_run_models = DbtTaskGroup(
         group_id="dbt_run_models",
+        operator_args={"install_deps": True},
         project_config=PROJECT_CONFIG,
         profile_config=PROFILE_CONFIG,
         execution_config=EXECUTION_CONFIG,
