@@ -1,4 +1,4 @@
-FROM quay.io/astronomer/astro-runtime:11.3.0
+FROM quay.io/astronomer/astro-runtime:11.5.0
 
 WORKDIR /usr/local/airflow/
 
