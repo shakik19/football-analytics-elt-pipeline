@@ -7,7 +7,7 @@ provider "google" {
 resource "google_storage_bucket" "gcs_bucket" {
   name     = "${var.ENV_NAME}-transfermarkt-data"
   location = var.REGION
-
+  force_destroy = true
   public_access_prevention = "enforced"
 }
 

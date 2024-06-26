@@ -38,7 +38,7 @@ resource "astro_deployment" "standard" {
       astro_machine      = "A20"
       max_worker_count   = 1
       min_worker_count   = 1
-      worker_concurrency = 8
+      worker_concurrency = 4
   }]
   environment_variables = [
     {
@@ -47,23 +47,32 @@ resource "astro_deployment" "standard" {
       is_secret = true
     },
     {
-      key   = "GCP_SA_PRIVATE_KEY"
-      value = var.GCP_SA_PRIVATE_KEY
+      key       = "GCP_SA_PRIVATE_KEY"
+      value     = var.GCP_SA_PRIVATE_KEY
       is_secret = true
     },
     {
-      key   = "GCP_SA_CLIENT_EMAIL"
-      value = var.GCP_SA_CLIENT_EMAIL
+      key       = "GCP_SA_CLIENT_EMAIL"
+      value     = var.GCP_SA_CLIENT_EMAIL
       is_secret = true
     },
     {
-      key   = "GCP_SA_CLIENT_ID"
-      value = var.GCP_SA_CLIENT_ID
+      key       = "GCP_SA_CLIENT_ID"
+      value     = var.GCP_SA_CLIENT_ID
       is_secret = true
     },
     {
-      key   = "ENV_NAME"
-      value = var.ENV_NAME
+      key       = "KAGGLE_USERNAME"
+      value     = var.KAGGLE_USERNAME
+      is_secret = true
+    },
+    {
+      key   = "KAGGLE_KEY"
+      value = var.KAGGLE_KEY
+    },
+    {
+      key       = "ENV_NAME"
+      value     = var.ENV_NAME
       is_secret = false
     },
     {
