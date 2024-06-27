@@ -22,15 +22,16 @@ resource "astro_deployment" "standard" {
   resource_quota_cpu             = "8"
   resource_quota_memory          = "16Gi"
   scheduler_size                 = "SMALL"
-  scaling_spec = {
-    hibernation_spec = {
-      schedules = [{
-        is_enabled        = true
-        wake_at_cron      = "10 6 * * 3"
-        hibernate_at_cron = "30 6 * * 3"
-      }]
-    }
-  }
+  # The config below makes the deployment stale during the specified time. To use it make the is_development_mode=false 
+  # scaling_spec = {
+  #   hibernation_spec = {
+  #     schedules = [{
+  #       is_enabled        = true
+  #       wake_at_cron      = "10 6 * * 3"
+  #       hibernate_at_cron = "30 6 * * 3"
+  #     }]
+  #   }
+  # }
   worker_queues = [
     {
       name               = "default"
