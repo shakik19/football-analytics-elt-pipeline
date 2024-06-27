@@ -98,10 +98,12 @@ For production setup, CI/CD is enforced using GitHub Actions to Astro deployment
 This section hasn't been configured yet but I have a plan to make a logging data pipeline using the ELK stack in the near future.
 
 ## Data Visualization
-
 The interactive dashboard below provides a comprehensive seasonal analysis of various football clubs, offering valuable insights into their performance and trends throughout the season.
+<div style="text-align: center;">
+  <img src="./assets/visualization/Celtic_2023.png" alt="Architecture">
+</div>
 
-[Due to security concerns I can't provide access to the interactive dashboard. The dashboard isn't totally static, on paremeter changes or after certain interval it queries data from BigQuery which isn't entirely free.]
+*Due to security concerns I can't provide access to the interactive dashboard. The dashboard isn't totally static, on paremeter changes or after certain interval it queries data from BigQuery which isn't entirely free. You can find images of some other club's dashboard grouped by league [here](./assets/visualization/)*
 
 ## Improvements
 
