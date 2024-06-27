@@ -1,9 +1,13 @@
+![Python 3](https://img.shields.io/badge/Python-3.11.2-green?style=flat&logo=python&logoColor=white)
+![Google Cloud](https://img.shields.io/badge/Google_Cloud-3772FF?style=flat&logo=googlecloud&logoColor=white&labelColor=3772FF)
+![Terraform](https://img.shields.io/badge/Terraform-1.8.5-black?style=flat&logo=terraform&logoColor=white&labelColor=573EDA)
+![Apache Airflow](https://img.shields.io/badge/Apache_Airflow-2.9.2-black?style=flat&logo=apacheairflow&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-blue?style=flat&logo=docker&logoColor=white)
+
 # Transfermarkt Data Pipeline
 This is an end-to-end, production-tested ELT batch data pipeline using a modern data stack, designed in optimized way to streamline data processing and analysis of club football and the transfer market.
 
 ## Table of Contents
-- [Transfermarkt Data Pipeline](#transfermarkt-data-pipeline)
-  - [Table of Contents](#table-of-contents)
   - [Objectives](#objectives)
   - [Running the Pipeline](#running-the-pipeline)
   - [Pipeline Architecture](#pipeline-architecture)
