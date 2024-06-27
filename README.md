@@ -1,5 +1,6 @@
 ![Python 3](https://img.shields.io/badge/Python-3.11.2-green?style=flat&logo=python&logoColor=white)
 ![Google Cloud](https://img.shields.io/badge/Google_Cloud-3772FF?style=flat&logo=googlecloud&logoColor=white&labelColor=3772FF)
+![dbt Version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.8.3&color=orange)
 ![Terraform](https://img.shields.io/badge/Terraform-1.8.5-black?style=flat&logo=terraform&logoColor=white&labelColor=573EDA)
 ![Apache Airflow](https://img.shields.io/badge/Apache_Airflow-2.9.2-black?style=flat&logo=apacheairflow&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-blue?style=flat&logo=docker&logoColor=white)
