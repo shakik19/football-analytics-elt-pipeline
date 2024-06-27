@@ -32,7 +32,7 @@ For detailed instructions on how to run the pipeline, please refer to the follow
 
 ## Pipeline Architecture
 <div style="text-align: center;">
-  <img src="./assets/architecture/architecture.jpg" width="1262.82" height="500" alt="Architecture">
+  <img src="./assets/architecture/architecture.jpg" alt="Architecture">
 </div>
 
 The architecture of this project is designed to efficiently handle data extraction, processing, and transformation while ensuring scalability and reliability. The core components are integrated to streamline the data flow from raw sources to final analytical outputs, following industry best practices and leveraging modern data engineering tools.
@@ -50,7 +50,7 @@ The architecture of this project is designed to efficiently handle data extracti
 ## Workflow Description
 Airflow directed acyclic graph
 <div style="text-align: center;">
-  <img src="./assets/airflow/dag.jpg" width="1050" height="450" alt="DAG">
+  <img src="./assets/airflow/dag.jpg" alt="DAG">
 </div>
 
 ### Infrastructure Setup
