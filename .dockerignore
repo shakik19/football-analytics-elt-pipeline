@@ -1,3 +1,7 @@
+docs/*
+images/*
+*.sh
+*.md
 astro
 .git
 .env
