@@ -77,6 +77,10 @@ A corrupt file with inconsistent columns are handled. Pyarrow's auto schema dete
 Parquet files are loaded into Google Cloud Storage and then into Google BigQuery as staging (Silver) data.
 
 ### Transform
+DBT lineage graph
+<div style="text-align: center;">
+  <img src="./assets/visualization/dbt_lineage_graph.png" alt="dbt-lineage-graph">
+</div>
 
 Using DBT, data from the staging dataset is transformed into Gold level data. This process includes adding new values through extraction, filtering unnecessary values, fixing inconsistencies, reinforcing schemas if required, and some data modeling.
 
