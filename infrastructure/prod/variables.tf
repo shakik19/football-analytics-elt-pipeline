@@ -21,6 +21,11 @@ variable "GCP_SA_CLIENT_ID" {
   sensitive = true
 }
 
+variable "CLIENT_X509_CERT_URL" {
+  type = string
+  sensitive = true
+}
+
 variable "KAGGLE_USERNAME" {
   type = string
   sensitive = true

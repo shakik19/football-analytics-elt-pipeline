@@ -62,6 +62,11 @@ resource "astro_deployment" "standard" {
       is_secret = true
     },
     {
+      key       = "CLIENT_X509_CERT_URL"
+      value     = var.CLIENT_X509_CERT_URL
+      is_secret = true
+    },
+    {
       key       = "KAGGLE_USERNAME"
       value     = var.KAGGLE_USERNAME
       is_secret = true
