@@ -27,39 +27,40 @@ Ensure that you have the following tools installed in your local machine:
 
 2. **Set Up Credentials**:
    - Navigate to the [production infrastructure](../infrastructure/prod/) directory:
-   - Copy the contents of `template.env` to a separate `.env` in the same dir.
-   - Very carefully read and add all required variables in the `.env` and `*.tf` files
+   - Copy the contents of `template.env` to a separate `.env` in the same directory.
+   - Very carefully read and add all required variables in the `.env` and `*.tf` files  
+   *[I could have configured a Secret Manager to securely store all the sensitive variables except the gcp connection but ultimately I would have to make them available in the environment because there is no other options to authenticate DBT with BigQuery and the Kaggle api]*
 
 3. **Create the resources**:
   
-    Run the following commands to create resources
+    Run the following commands to create GCP and Astronomer resources
     ```bash
     terraform init
     source .env
     terraform plan
     terraform apply
     ```
-    Check the outputs if the resources are properly created 
+    Check the outputs and see if the resources are created without error 
 
-1. **Configure Astronomer Cloud**:
+4. **Configure Astronomer Cloud**:
     - Go to [Astronomer Cloud](https://cloud.astronomer.io) and add a **GCP connection** with the following details:
-      - **Connection ID**: `good_cloud_default` (case sensitive)
+      - **Connection ID**: `google_cloud_default` (case-sensitive)
     - Copy the **DEPLOYMENT ID** of the deployment you just created
-2. **Add GitHub Actions Secrets**:
+5. **Add GitHub Actions Secrets**:
     - Add the following secrets to your GitHub repository under **Settings > Secrets and variables > Actions**:
       - `ASTRO_API_TOKEN`: The API token used previously
       - `PROD_DEPLOYMENT_ID`: The deployment ID
 
-3. **Push the Repository to your GitHub account**
+6. **Push the Repository to your GitHub account**
 
-4. **Monitor GitHub Actions CI Job**:
+7. **Monitor GitHub Actions CI Job**:
  
     The GitHub Actions CI job will get triggered automatically. Monitor the job's progress in the **Actions** tab of your GitHub repository.
 
-6. **Verify Deployment**:
+8. **Verify Deployment**:
     - Upon completion of the CI job, your Astronomer deployment should be visible and running.
 
-7.  **Destroying the resources**:
+9.  **Destroying the resources**:
       ```bash
       terraform -chdir=./infrastructure/prod/ destroy
       ```

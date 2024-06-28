@@ -6,7 +6,7 @@
 ![Docker](https://img.shields.io/badge/Docker-blue?style=flat&logo=docker&logoColor=white)
 
 # Transfermarkt Data Pipeline
-This is an end-to-end, production-tested ELT batch data pipeline using a modern data stack, designed in optimized way to streamline data processing and analysis of club football and the transfer market.
+This is an end-to-end, production-tested ELT batch data pipeline using a modern data stack, designed in an optimized way to streamline data processing and analysis of club football and the transfer market.
 
 ## Table of Contents
   - [Objectives](#objectives)
@@ -26,7 +26,7 @@ This is an end-to-end, production-tested ELT batch data pipeline using a modern 
 
 ## Objectives
 
-This project aims to enable sports analysts to derive key insights about the football clubs, matches,players and the transfer market. A dashboard has been created about football club's seasonal stats using the final dataset to showcases the application. The dashboard also provides an option to compare multiple football clubs using the same matrices.
+This project aims to enable sports analysts to derive key insights about the football clubs, matches,players and the transfer market. A dashboard has been created about football club's seasonal stats using the final dataset to showcases the application
 
 ## Running the Pipeline
 
@@ -95,7 +95,7 @@ Using DBT, data from the staging dataset is transformed into Gold level data. Th
 
 ### CI/CD Pipeline
 
-For production setup, CI/CD is enforced using GitHub Actions to Astro deployment. Refer to the [Running the Pipeline in Production](./production_pipeline.md) section for more details.
+For production setup, CI/CD is enforced using GitHub Actions to Astro deployment. Refer to the [Running the Pipeline in Production](./docs/running_in_astro.md) section for more details.
 
 ### Alerting, Logging, and Monitoring
 
