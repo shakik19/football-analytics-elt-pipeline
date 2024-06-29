@@ -5,7 +5,7 @@ provider "astro" {
 
 resource "astro_deployment" "standard" {
   workspace_id                   = var.ASTRO_WORKSPACE_ID
-  original_astro_runtime_version = "11.5.0"
+  original_astro_runtime_version = "11.6.0"
   name                           = "transfermarkt-${var.ENV_NAME}"
   description                    = "A deployment for the transfermarkt data pipeline"
   type                           = "STANDARD"
@@ -17,29 +17,29 @@ resource "astro_deployment" "standard" {
   executor                       = "CELERY"
   is_cicd_enforced               = true
   is_dag_deploy_enabled          = true
-  is_development_mode            = false
+  is_development_mode            = true
   is_high_availability           = false
-  resource_quota_cpu             = "8"
-  resource_quota_memory          = "16Gi"
+  resource_quota_cpu             = "4"
+  resource_quota_memory          = "8Gi"
   scheduler_size                 = "SMALL"
   # The config below makes the deployment stale during the specified time. To use it make the is_development_mode=false 
-  # scaling_spec = {
-  #   hibernation_spec = {
-  #     schedules = [{
-  #       is_enabled        = true
-  #       wake_at_cron      = "10 6 * * 3"
-  #       hibernate_at_cron = "30 6 * * 3"
-  #     }]
-  #   }
-  # }
+  scaling_spec = {
+    hibernation_spec = {
+      schedules = [{
+        is_enabled        = true
+        wake_at_cron      = "10 6 * * 3"
+        hibernate_at_cron = "30 6 * * 3"
+      }]
+    }
+  }
   worker_queues = [
     {
       name               = "default"
       is_default         = true
-      astro_machine      = "A20"
+      astro_machine      = "A10"
       max_worker_count   = 1
       min_worker_count   = 1
-      worker_concurrency = 4
+      worker_concurrency = 16
   }]
   environment_variables = [
     {
