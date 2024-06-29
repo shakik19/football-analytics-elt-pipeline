@@ -19,8 +19,8 @@ resource "astro_deployment" "standard" {
   is_dag_deploy_enabled          = true
   is_development_mode            = false
   is_high_availability           = false
-  resource_quota_cpu             = "8"
-  resource_quota_memory          = "16Gi"
+  resource_quota_cpu             = "4"
+  resource_quota_memory          = "8Gi"
   scheduler_size                 = "SMALL"
   # The config below makes the deployment stale during the specified time. To use it make the is_development_mode=false 
   # scaling_spec = {
@@ -36,10 +36,10 @@ resource "astro_deployment" "standard" {
     {
       name               = "default"
       is_default         = true
-      astro_machine      = "A20"
+      astro_machine      = "A10"
       max_worker_count   = 1
       min_worker_count   = 1
-      worker_concurrency = 4
+      worker_concurrency = 5
   }]
   environment_variables = [
     {
