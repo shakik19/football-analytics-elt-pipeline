@@ -9,6 +9,8 @@
 This is an end-to-end, production-tested ELT batch data pipeline using a modern data stack, designed in an optimized way to streamline data processing and analysis of club football and the transfer market.
 
 ## Table of Contents
+- [Transfermarkt Data Pipeline](#transfermarkt-data-pipeline)
+  - [Table of Contents](#table-of-contents)
   - [Objectives](#objectives)
   - [Running the Pipeline](#running-the-pipeline)
   - [Pipeline Architecture](#pipeline-architecture)
@@ -60,7 +62,7 @@ Airflow directed acyclic graph
 
 ### Infrastructure Setup
 
-Terraform is used to manage the creation and destruction of resources. The main resources are Astronomer workspace, cluster, deployment for production setup and general cloud resources like Cloud Storage Bucket and BigQuery datasets. Refer to the [infrastructure directory](./infrastructure) for details.
+Terraform is used to provision all the cloud resources. Astronomer deployment, Google Cloud Storage and Google BigQuery. Refer to the [infrastructure directory](./infrastructure) for details.
 
 ### Extract
 
@@ -89,7 +91,6 @@ Using DBT, data from the staging dataset is transformed into Gold level data. Th
 1. **Validating and Freshness Tests:** Ensuring data accuracy and timeliness through validation and freshness checks.
 2. **Incremental Materialization:** Processing only new data to improve efficiency and reduce computational costs.
 3. **Partitioning and Clustering:** Organizing data based on hypothetical needs to speed up query performance and retrieval times.
-4. **Business-Level Aggregation:** Summarizing data to provide actionable insights for reporting and analysis.
 
 **Issue:** Initially, materialized views were used for reporting tables to enhance data retrieval by pre-computing and storing data at refresh intervals. However, due to limitations with BigQuery's materialized views, regular views are now used, which only store the query logic.
 
