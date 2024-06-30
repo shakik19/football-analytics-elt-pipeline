@@ -2,8 +2,8 @@
 
 ### Requirements
 Ensure that you have the following tools installed in your local machine:
-. **[Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)**
-. **[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)**
+**[Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)** and
+**[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)**
 <!-- . **[GitHub CLI (`gh`)](https://cli.github.com/manual/installation)** -->
 
 ### Access and Credentials
@@ -13,14 +13,14 @@ Ensure that you have the following tools installed in your local machine:
         - **Storage Admin**
     - **Kaggle API Key**
     - **Astronomer Cloud**
-    - A *Workspace-scoped* Author API Token
-    - Some resource IDs:
-        - **ORGANIZATION ID**
-        - **WORKSPACE ID**
+        - Some resource IDs related to where you want to deploy:
+            - **ORGANIZATION ID**
+            - **WORKSPACE ID**
+        - A *Workspace-scoped Operator* API Token
 
 ## Deployment Setup
 1. **Astro Runtime Check**  
-    Before moving forward make sure that the [latest astro runtime version](https://www.astronomer.io/docs/astro/runtime-release-notes) matches with the runtime defined in the [Dockerfile](../Dockerfile) and in the [astronomer terraform file](../infrastructure/prod/astronomer.tf). Version mismatch can cause error while creating infrastructure.
+    Before moving forward make sure that the [latest astro runtime version](https://www.astronomer.io/docs/astro/runtime-release-notes) matches with the runtime defined in the `./Dockerfile` and in the `./infrastructure/prod/astronomer.tf`. Version mismatch can cause error while creating infrastructure.
 
 2. **Clone the Repository**:
       ```sh
@@ -28,7 +28,7 @@ Ensure that you have the following tools installed in your local machine:
       ```
 
 3. **Set Up Credentials**:
-   - Navigate to the [production infrastructure](../infrastructure/prod/) directory:
+   - Navigate to the `./infrastructure/prod/` directory:
    - Copy the contents of `template.env` to a separate `.env` in the same directory.
    - Very carefully read and add all required variables in the `.env` and `*.tf` files  
    *[I could have configured a Secret Manager to securely store all the sensitive variables except the gcp connection but ultimately I would have to make them available in the environment because there is no other options to authenticate DBT with BigQuery and the Kaggle api]*
@@ -51,7 +51,7 @@ Ensure that you have the following tools installed in your local machine:
 6. **Add GitHub Actions Secrets**:
     - Add the following secrets to your GitHub repository under **Settings > Secrets and variables > Actions**:
       - `ASTRO_API_TOKEN`: The API token used previously
-      - `PROD_DEPLOYMENT_ID`: The deployment ID
+      - `PROD_DEPLOYMENT_ID`: Available at **Astronomer Cloud > Workspace > Deployments**
 
 7. **Push the Repository to your GitHub account**
 
