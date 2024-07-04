@@ -84,7 +84,7 @@ with DAG(
             filename = f"{table}.parquet"
             src_file_path = os.path.join(t_transformer.PARQUET_DATASET_DIR, filename)
             gcs_file_path = os.path.join(PROJECT_NAME, filename)
-            table_name = f"{os.getenv('PROJECT_ID')}.{os.getenv('SEED_DATASET_NAME')}.{table}"
+            table_name = f"{os.getenv('PROJECT_ID')}.{os.getenv('STAGING_DATASET_NAME')}.{table}"
             gcs_file_uri_prefix = os.path.join(GCS_BUCKET_NAME, gcs_file_path)
             
             """ 

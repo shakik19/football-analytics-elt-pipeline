@@ -11,8 +11,8 @@ resource "google_storage_bucket" "gcs_bucket" {
   public_access_prevention = "enforced"
 }
 
-resource "google_bigquery_dataset" "dataset_seed" {
-  dataset_id                 = "${var.ENV_NAME}_transfermarkt_seed"
+resource "google_bigquery_dataset" "dataset_staging" {
+  dataset_id                 = "${var.ENV_NAME}_transfermarkt_staging"
   location                   = var.REGION
   delete_contents_on_destroy = true
 }

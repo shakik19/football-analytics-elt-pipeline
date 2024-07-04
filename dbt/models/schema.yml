@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: raw
-    schema: "{{ env_var('SEED_DATASET_NAME') }}"
+    schema: "{{ env_var('STAGING_DATASET_NAME') }}"
     tables:
       - name: appearances
       - name: club_games

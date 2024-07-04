@@ -18,7 +18,7 @@ variable "region" {
 }
 
 
-variable "seed_dataset_id" {
+variable "staging_dataset_id" {
   description = <<EOT
   A unique dataset id. Please check the official documentation for details
   naming convention

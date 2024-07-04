@@ -62,7 +62,7 @@ class DataLoader:
             The name of the BigQuery table.
         """
         project_id = os.getenv("PROJECT_ID")
-        dataset_name = os.getenv("SEED_DATASET_NAME")
+        dataset_name = os.getenv("STAGING_DATASET_NAME")
         client = bigquery.Client()
 
         query = f"""
@@ -80,7 +80,7 @@ class DataLoader:
         except TypeError as e:
             self.logger.error(e)
 
-    def load_bigquery_seed_dataset(self):
+    def load_bigquery_staging_dataset(self):
         """
         Loads all parquet files into their respective BigQuery tables using threading.
         """

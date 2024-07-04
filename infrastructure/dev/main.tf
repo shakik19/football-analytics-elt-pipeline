@@ -30,8 +30,8 @@ resource "google_storage_bucket" "gcs_bucket" {
   }
 }
 
-resource "google_bigquery_dataset" "dataset_seed" {
-  dataset_id                 = var.seed_dataset_id
+resource "google_bigquery_dataset" "dataset_staging" {
+  dataset_id                 = var.staging_dataset_id
   location                   = var.region
   delete_contents_on_destroy = true
 }

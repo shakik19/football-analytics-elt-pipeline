@@ -38,7 +38,7 @@ resource "astro_deployment" "standard" {
       is_default         = true
       astro_machine      = "A10"
       max_worker_count   = 1
-      min_worker_count   = 1
+      min_worker_count   = 0
       worker_concurrency = 5
   }]
   environment_variables = [
@@ -93,8 +93,8 @@ resource "astro_deployment" "standard" {
       is_secret = false
     },
     {
-      key       = "SEED_DATASET_NAME",
-      value     = "${var.ENV_NAME}_transfermarkt_seed"
+      key       = "STAGING_DATASET_NAME",
+      value     = "${var.ENV_NAME}_transfermarkt_staging"
       is_secret = false
     },
     {
