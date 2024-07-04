@@ -79,12 +79,23 @@ A corrupt file with inconsistent columns are handled. Pyarrow's auto schema dete
 Parquet files are loaded into Google Cloud Storage and then into Google BigQuery as staging (Silver) data.
 
 ### Transform
-DBT lineage graph
+
 <div style="text-align: center;">
   <img src="./assets/visualization/dbt_lineage_graph.png" alt="dbt-lineage-graph">
+  <p>DBT Lineage Graph</p>
 </div>
 
 Using DBT, data from the staging dataset is transformed into Gold level data. This process includes adding new values through extraction, filtering unnecessary values, fixing inconsistencies, reinforcing schemas if required, and some data modeling.
+
+The data model of the warehouse uses the **Snowflake schema**. A snowflake schema is a type of dimensional modeling that builds upon the star schema concept. It offers a more normalized structure, suitable for data warehouses with complex data models and intricate relationships between dimensions.
+
+<div style="text-align: center;">
+  <img src="./assets/data model/partial_data_model.jpg" alt="data-model">
+  <p>Partial data model</p>
+</div>
+
+**Why snowflake schema?**
+As you can see in the ER diagram, the fact tables rely on common dimensional tables as a result normalization minimizes duplication of data across dimension tables, leading to more efficient storage usage. Normalization also helps to prevent data inconsistencies. I also want to mention that from source the data came already came in a very normalized form. I only merged two fact tables to one fact and dim tables for my flexibility and added a country code dimension for analysis that requires geographical data. 
 
 **Best practices and optimizations:**
 
