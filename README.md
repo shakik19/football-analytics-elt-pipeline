@@ -99,7 +99,7 @@ As you can see in the ER diagram, the fact tables rely on common dimensional tab
 
 **Best practices and optimizations:**
 
-1. **Validating and Freshness Tests:** Ensuring data accuracy and timeliness through validation and freshness checks.
+1. **Validating Tests:** Ensuring data accuracy through validation checks.
 2. **Incremental Materialization:** Processing only new data to improve efficiency and reduce computational costs.
 3. **Partitioning and Clustering:** Organizing data based on hypothetical needs to speed up query performance and retrieval times.
 
