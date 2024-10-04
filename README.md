@@ -6,7 +6,8 @@
 ![Docker](https://img.shields.io/badge/Docker-blue?style=flat&logo=docker&logoColor=white)
 
 # Transfermarkt Data Pipeline
-This is an end-to-end, production-tested ELT batch data pipeline using a modern data stack, designed in an optimized way to streamline data processing and analysis of club football and the transfer market.
+This project is an end-to-end ELT batch data pipeline, built with a modern data stack and optimized for efficient data processing and analysis of [transfermarkt data](https://www.transfermarkt.com). It is fully configured for deployment on Astronomer Cloud with CI, streamlining the entire process.
+
 
 ## Table of Contents
 - [Transfermarkt Data Pipeline](#transfermarkt-data-pipeline)
